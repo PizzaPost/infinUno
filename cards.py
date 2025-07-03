@@ -1,5 +1,5 @@
 class Card:
-    def __init__(self, name, add=0, mult=1, affects=[1], color=None, nextColor=None, image="uno.png"):
+    def __init__(self, name: str, add: int = 0, mult: int = 1, affects: list[int] = [1], color: str = "", nextColor: str = "", image: str = "uno.png"):
         self.name = name
         self.add = add
         self.mult = mult
