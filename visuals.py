@@ -10,7 +10,7 @@ class Window:
         self.height = pygame.display.Info().current_h
         self.name = name
         self.icon = pygame.image.load("resources/icon.png")
-        pg = pygame.display.set_mode()
+        pg = pygame.display.set_mode((pygame.display.Info().current_w, pygame.display.Info().current_h), pygame.SCALED)
         pygame.display.set_caption(self.name)
         pygame.display.set_icon(self.icon)
 
