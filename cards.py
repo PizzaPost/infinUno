@@ -42,7 +42,7 @@ class Card:
 ALL_CARDS = []
 
 for color in ["red", "blue", "green", "yellow", "purple"]:
-    for i in range(1, 10):
+    for i in range(10):
         ALL_CARDS.append(
             Card(
                 name=color + str(i),
