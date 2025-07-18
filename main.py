@@ -3,4 +3,5 @@ import players
 import visuals
 
 if __name__ == '__main__':
-    pass
+    window = visuals.Window("InfinUno")
+    window.run()
