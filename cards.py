@@ -1,6 +1,14 @@
 import random
 
 
+def getImageList(extraImages: list[str] = []) -> list[str]:
+    images = []
+    images.extend(extraImages)
+    images.append("frame.png")
+
+    return images
+
+
 class Card:
     def __init__(
         self,
@@ -12,7 +20,7 @@ class Card:
         reverse: bool = False,
         color: str = "",
         nextColor: str = "",
-        image: list[str] = ["unoBG.png", "unoFG.png"],
+        image: list[str] = getImageList(["unoBG.png", "unoFG.png"]),
     ):
         self.name = name
         self.add = add
@@ -33,35 +41,109 @@ class Card:
 
 ALL_CARDS = []
 
-for color in ["red", "blue", "green", "yellow", "magenta"]:
+for color in ["red", "blue", "green", "yellow", "purple"]:
     for i in range(1, 10):
         ALL_CARDS.append(
-            Card(name=str(i), color=color, image=[f"{color}.png", f"{i}.png"])
+            Card(
+                name=color + str(i),
+                color=color,
+                image=getImageList([f"{color}.png", f"{i}.png"]),
+            )
         )
     ALL_CARDS.append(
-        Card(name="skip", color=color, skip=True, image=[f"{color}.png", f"skip.png"])
+        Card(
+            name=color + "skip",
+            color=color,
+            skip=True,
+            image=getImageList([f"{color}.png", f"skip.png"]),
+        )
     )
     ALL_CARDS.append(
         Card(
-            name="reverse",
+            name=color + "reverse",
             color=color,
             reverse=True,
-            image=[f"{color}.png", f"reverse.png"],
+            image=getImageList([f"{color}.png", f"reverse.png"]),
         )
     )
     ALL_CARDS.append(
-        Card(name="+2", color=color, image=[f"{color}.png", "+2.png"], add=2)
+        Card(
+            name=color + "+2",
+            color=color,
+            image=getImageList([f"{color}.png", "+2.png"]),
+            add=2,
+        )
     )
     ALL_CARDS.append(
-        Card(name="+1", color=color, image=[f"{color}.png", "+1.png"], add=1, skip=True)
+        Card(
+            name=color + "+1",
+            color=color,
+            image=getImageList([f"{color}.png", "+1.png"]),
+            add=1,
+            skip=True,
+        )
     )
-    ALL_CARDS.append(Card(name="-1", color=color, image=[f"{color}.png", "-1.png"], add=-1, affects=[0]))
+    ALL_CARDS.append(
+        Card(
+            name=color + "-1",
+            color=color,
+            image=getImageList([f"{color}.png", "-1.png"]),
+            add=-1,
+            affects=[0],
+        )
+    )
 
-ALL_CARDS.append(Card(name="wild", image=["black.png", "wild.png"]))
-ALL_CARDS.append(Card(name="+4", image=["black.png", "+4.png"], add=4, skip=True))
-ALL_CARDS.append(Card(name="*4", image=["black.png", "*4.png"], mult=4, skip=True))
-ALL_CARDS.append(Card(name="*2", image=["black.png", "*2.png"], mult=2, skip=True))
-ALL_CARDS.append(Card(name="/2", image=["black.png", "/2.png"], mult=1/2, skip=True))
+ALL_CARDS.append(
+    Card(
+        name="wild",
+        color="choice",
+        image=getImageList(["base/multicolored.png", "mini_card/uncolored.png"]),
+    )
+)
+ALL_CARDS.append(
+    Card(
+        name="+4",
+        color="choice",
+        image=getImageList(
+            ["base/multicolored.png", "mini_card/uncolored.png", "corners/plu4.png"]
+        ),
+        add=4,
+        skip=True,
+    )
+)
+ALL_CARDS.append(
+    Card(
+        name="*4",
+        color="choice",
+        image=getImageList(
+            ["base/multicolored.png", "mini_card/uncolored.png", "corners/mul4.png"]
+        ),
+        mult=4,
+        skip=True,
+    )
+)
+ALL_CARDS.append(
+    Card(
+        name="*2",
+        color="choice",
+        image=getImageList(
+            ["base/multicolored.png", "mini_card/uncolored.png", "corners/mul2.png"]
+        ),
+        mult=2,
+        skip=True,
+    )
+)
+ALL_CARDS.append(
+    Card(
+        name="/2",
+        color="choice",
+        image=getImageList(
+            ["base/multicolored.png", "mini_card/uncolored.png", "corners/div2.png"]
+        ),
+        mult=1 / 2,
+        skip=True,
+    )
+)
 
 
 class Deck:
