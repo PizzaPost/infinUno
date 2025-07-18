@@ -90,3 +90,6 @@ class Deck:
 
     def __repr__(self):
         return f"Deck with {len(self.cards)} cards"
+
+if __name__ == "__main__":
+    print(ALL_CARDS)
