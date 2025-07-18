@@ -97,7 +97,7 @@ ALL_CARDS.append(
     Card(
         name="wild",
         color="choice",
-        image=getImageList(["base/multicolored.png", "mini_card/uncolored.png"]),
+        image=getImageList(["base/multicolored.png", "mini_card/uncolored.png", "corners/questionmark.png"]),
     )
 )
 ALL_CARDS.append(
