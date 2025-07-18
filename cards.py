@@ -70,7 +70,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
         Card(
             name=color + "+2",
             color=color,
-            image=getImageList([f"{color}.png", "+2.png"]),
+            image=getImageList([f"{color}.png", "corners/plu2.png"]),
             add=2,
         )
     )
@@ -78,7 +78,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
         Card(
             name=color + "+1",
             color=color,
-            image=getImageList([f"{color}.png", "+1.png"]),
+            image=getImageList([f"{color}.png", "corners/plu1.png"]),
             add=1,
             skip=True,
         )
@@ -87,7 +87,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
         Card(
             name=color + "-1",
             color=color,
-            image=getImageList([f"{color}.png", "-1.png"]),
+            image=getImageList([f"{color}.png", "corners/min1.png"]),
             add=-1,
             affects=[0],
         )
