@@ -7,14 +7,11 @@ pygame.init()
 
 
 class Window:
-    def __init__(self, name, debugging=False):
-        self.debugging = debugging
-        self.cardIndex = 0
+    def __init__(self, name):
         self.width = pygame.display.Info().current_w
         self.height = pygame.display.Info().current_h
         self.name = name
         self.icon = pygame.image.load("resources/icon.png")
-        self.imageFailed = False
         self.window = pygame.display.set_mode(
             (pygame.display.Info().current_w, pygame.display.Info().current_h),
             pygame.SCALED,
@@ -22,34 +19,8 @@ class Window:
         pygame.display.set_caption(self.name)
         pygame.display.set_icon(self.icon)
         self.running = False
-        # threading.Thread(target=self.run, daemon=True).start()
-        self.run()
 
-    def run(self):
-        self.running = True
-        while self.running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    print("Exiting...")
-                    self.running = False
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_ESCAPE]:
-                print("Exiting...")
-                self.running = False
-            if (keys[pygame.K_SPACE] or self.imageFailed) and self.debugging:
-                self.imageFailed = False
-                self.showCard(
-                    "center", "center", ALL_CARDS[self.cardIndex % len(ALL_CARDS)]
-                )
-                self.cardIndex += 1
-                pygame.time.delay(100)
-
-            # PER FRAME CODE HERE
-
-            pygame.display.flip()
-        quit()
-
-    def showCard(self, x, y, card):
+    def showCard(self, x, y, angle, card):
         # Display a card image at (x, y). If x or y is "center", center the card.
         # Assemble the card image by overlaying all image paths in card.image
         try:
@@ -71,8 +42,33 @@ class Window:
             card_rect.y = (self.height - card_rect.height) // 2
         else:
             card_rect.y = y
-        self.window.blit(card_img, card_rect)
+        rotated_card = pygame.transform.rotate(card_img, angle)
+        rotated_card_rect = rotated_card.get_rect(center=card_rect.center)
+        self.window.blit(rotated_card, rotated_card_rect)
 
 
 if __name__ == "__main__":
-    window = Window("PizzaPost", debugging=True)
+    window = Window("PizzaPost")
+    cardIndex = 0
+    imageFailed = False
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                exit(0)
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            running = False
+            pygame.quit()
+            exit(0)
+        if keys[pygame.K_SPACE] or imageFailed:
+            imageFailed = False
+            window.showCard("center", "center", ALL_CARDS[cardIndex % len(ALL_CARDS)])
+            cardIndex += 1
+            pygame.time.delay(100)
+
+        # PER FRAME CODE HERE
+
+        pygame.display.flip()
