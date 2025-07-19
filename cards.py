@@ -4,7 +4,7 @@ import random
 def getImageList(extraImages: list[str] = []) -> list[str]:
     images = []
     images.extend(extraImages)
-    images.append("frame.png")
+    images.append("resources/cards/frame.png")
 
     return images
 
@@ -20,7 +20,7 @@ class Card:
         reverse: bool = False,
         color: str = "",
         nextColor: str = "",
-        image: list[str] = getImageList(["unoBG.png", "unoFG.png"]),
+        image: list[str] = getImageList(["resources/cards/unoBG.png", "resources/cards/unoFG.png"]),
     ):
         self.name = name
         self.add = add
@@ -42,12 +42,12 @@ class Card:
 ALL_CARDS = []
 
 for color in ["red", "blue", "green", "yellow", "purple"]:
-    for i in range(1, 10):
+    for i in range(10):
         ALL_CARDS.append(
             Card(
                 name=color + str(i),
                 color=color,
-                image=getImageList([f"{color}.png", f"{i}.png"]),
+                image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/corners/{i}.png"]),
             )
         )
     ALL_CARDS.append(
@@ -55,7 +55,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
             name=color + "skip",
             color=color,
             skip=True,
-            image=getImageList([f"{color}.png", f"skip.png"]),
+            image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/corners/skip.png"]),
         )
     )
     ALL_CARDS.append(
@@ -63,14 +63,14 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
             name=color + "reverse",
             color=color,
             reverse=True,
-            image=getImageList([f"{color}.png", f"reverse.png"]),
+            image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/corners/reverse.png"]),
         )
     )
     ALL_CARDS.append(
         Card(
             name=color + "+2",
             color=color,
-            image=getImageList([f"{color}.png", "+2.png"]),
+            image=getImageList([f"resources/cards/base/{color}.png", "resources/cards/corners/plu2.png"]),
             add=2,
         )
     )
@@ -78,7 +78,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
         Card(
             name=color + "+1",
             color=color,
-            image=getImageList([f"{color}.png", "+1.png"]),
+            image=getImageList([f"resources/cards/base/{color}.png", "resources/cards/corners/plu1.png"]),
             add=1,
             skip=True,
         )
@@ -87,7 +87,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
         Card(
             name=color + "-1",
             color=color,
-            image=getImageList([f"{color}.png", "-1.png"]),
+            image=getImageList([f"resources/cards/base/{color}.png", "resources/cards/corners/min1.png"]),
             add=-1,
             affects=[0],
         )
@@ -97,7 +97,7 @@ ALL_CARDS.append(
     Card(
         name="wild",
         color="choice",
-        image=getImageList(["base/multicolored.png", "mini_card/uncolored.png", "corners/questionmark.png"]),
+        image=getImageList(["resources/cards/base/multicolored.png", "resources/cards/mini_card/uncolored.png", "resources/cards/corners/questionmark.png"]),
     )
 )
 ALL_CARDS.append(
@@ -105,7 +105,7 @@ ALL_CARDS.append(
         name="+4",
         color="choice",
         image=getImageList(
-            ["base/multicolored.png", "mini_card/uncolored.png", "corners/plu4.png"]
+            ["resources/cards/base/multicolored.png", "resources/cards/mini_card/uncolored.png", "resources/cards/corners/plu4.png"]
         ),
         add=4,
         skip=True,
@@ -116,7 +116,7 @@ ALL_CARDS.append(
         name="*4",
         color="choice",
         image=getImageList(
-            ["base/multicolored.png", "mini_card/uncolored.png", "corners/mul4.png"]
+            ["resources/cards/base/multicolored.png", "resources/cards/mini_card/uncolored.png", "resources/cards/corners/mul4.png"]
         ),
         mult=4,
         skip=True,
@@ -127,7 +127,7 @@ ALL_CARDS.append(
         name="*2",
         color="choice",
         image=getImageList(
-            ["base/multicolored.png", "mini_card/uncolored.png", "corners/mul2.png"]
+            ["resources/cards/base/multicolored.png", "resources/cards/mini_card/uncolored.png", "resources/cards/corners/mul2.png"]
         ),
         mult=2,
         skip=True,
@@ -138,7 +138,7 @@ ALL_CARDS.append(
         name="/2",
         color="choice",
         image=getImageList(
-            ["base/multicolored.png", "mini_card/uncolored.png", "corners/div2.png"]
+            ["resources/cards/base/multicolored.png", "resources/cards/mini_card/uncolored.png", "resources/cards/corners/div2.png"]
         ),
         mult=1 / 2,
         skip=True,
