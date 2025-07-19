@@ -65,7 +65,7 @@ if __name__ == "__main__":
             exit(0)
         if keys[pygame.K_SPACE] or imageFailed:
             imageFailed = False
-            window.showCard("center", "center", ALL_CARDS[cardIndex % len(ALL_CARDS)])
+            window.showCard("center", "center", 0, ALL_CARDS[cardIndex % len(ALL_CARDS)])
             cardIndex += 1
             pygame.time.delay(100)
 

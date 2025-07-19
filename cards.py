@@ -34,27 +34,27 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
     for i in range(10):
         ALL_CARDS.append(
             Card(name=color + str(i), color=color,
-                 image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/corners/{i}.png"])))
+                 image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/mini_card/{color}.png", f"resources/cards/corners/{i}.png"])))
 
     ALL_CARDS.append(
         Card(name=color + "skip", color=color, skip=True,
-             image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/corners/skip.png"])))
+             image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/mini_card/{color}.png", f"resources/cards/corners/skip.png"])))
 
     ALL_CARDS.append(
         Card(name=color + "reverse", color=color, reverse=True,
-             image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/corners/reverse.png"])))
+             image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/mini_card/{color}.png", f"resources/cards/corners/reverse.png"])))
 
     ALL_CARDS.append(
         Card(name=color + "+2", color=color, add=2,
-             image=getImageList([f"resources/cards/base/{color}.png", "resources/cards/corners/plu2.png"])))
+             image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/mini_card/{color}.png", "resources/cards/corners/plu2.png"])))
 
     ALL_CARDS.append(
         Card(name=color + "+1", color=color, skip=True, add=1,
-             image=getImageList([f"resources/cards/base/{color}.png", "resources/cards/corners/plu1.png"])))
+             image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/mini_card/{color}.png", "resources/cards/corners/plu1.png"])))
 
     ALL_CARDS.append(
         Card(name=color + "-1", color=color, add=-1, affects=[0],
-             image=getImageList([f"resources/cards/base/{color}.png", "resources/cards/corners/min1.png"])))
+             image=getImageList([f"resources/cards/base/{color}.png", f"resources/cards/mini_card/{color}.png", "resources/cards/corners/min1.png"])))
 
 ALL_CARDS.append(
     Card(name="wild", color="choice",
