@@ -1,4 +1,9 @@
 import random
+import pygame
+
+pygame.init()
+pygame.display.init()
+pygame.display.set_mode((1, 1), pygame.HIDDEN)
 
 
 def getImageList(extraImages: list[str] = []) -> list[str]:
@@ -32,7 +37,16 @@ class Card:
         self.reverse = reverse
         self.color = color
         self.nextColor = nextColor if nextColor is not None else color
-        self.image = image
+
+        img = pygame.image.load(image[0]).convert_alpha()
+        for img_path in image[1:]:
+            try:
+                overlay_img = pygame.image.load(img_path).convert_alpha()
+                img.blit(overlay_img, (0, 0))
+            except Exception as e:
+                img = pygame.image.load("resources/icon.png").convert_alpha()
+                break
+        self.image = img
 
     def __str__(self):
         return self.name
@@ -246,5 +260,6 @@ class Deck:
         return f"Deck with {len(self.cards)} cards"
 
 
+pygame.quit()
 if __name__ == "__main__":
     print(ALL_CARDS)
