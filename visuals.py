@@ -22,17 +22,7 @@ class Window:
 
     def showCard(self, x, y, angle, card):
         # Display a card image at (x, y). If x or y is "center", center the card.
-        # Assemble the card image by overlaying all image paths in card.image
-        try:
-            base_img = pygame.image.load(card.image[0]).convert_alpha()
-            for img_path in card.image[1:]:
-                overlay_img = pygame.image.load(img_path).convert_alpha()
-                base_img.blit(overlay_img, (0, 0))
-            card_img = base_img
-        except Exception as e:
-            print(f"Error loading card image: {e}")
-            self.imageFailed = True
-            return
+        card_img = card.image
         card_rect = card_img.get_rect()
         if x == "center":
             card_rect.x = (self.width - card_rect.width) // 2
