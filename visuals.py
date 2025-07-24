@@ -1,7 +1,12 @@
 # PizzaPost magic here
 import pygame
 
-from cards import ALL_CARDS
+import sys, os
+
+# read this comment in main.py for more info
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from infinUno.cards import ALL_CARDS
 
 pygame.init()
 

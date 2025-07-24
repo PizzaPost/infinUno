@@ -2,10 +2,16 @@ import random
 
 import pygame
 
-import cards
-import visuals
+import sys, os
+
+# This makes sure the parent directory is on path, allowing imports from inside the infinUno package, while also allowing other scripts to use this folder as a package.
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from . import cards
+from . import visuals
 
 pygame.init()
+
 
 def show_deck(window, deck, FRAME):
     for x in range(len(deck.cards)):
@@ -41,6 +47,7 @@ def show_deck(window, deck, FRAME):
             ),
             card=deck.cards[x],
         )
+
 
 if __name__ == "__main__":
     window = visuals.Window("InfinUno")
