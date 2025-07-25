@@ -124,6 +124,7 @@ def init(bot):
                     return
                 if self.message:
                     await self.message.edit(content="Lobby aborted.", view=None) # type: ignore
+                await asyncio.sleep(1)  # Give the message time to update
                 self.players.clear()
                 self.host = None
 
