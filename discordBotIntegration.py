@@ -216,7 +216,7 @@ def init(bot):
                                 stackable.append(c)
                         if stackable:
                             # Let the player stack (this is a placeholder for actual interaction)
-                            # In a real implementation, you'd prompt the player to play a stackable card
+                            # later, we'll prompt the player to play a stackable card
                             # For now, just play the first stackable card
                             played_card = stackable[0]
                             self.nextMessageContent += f"\nYou automatically played your first stackable card: {played_card.name}."
