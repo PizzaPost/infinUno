@@ -1,6 +1,7 @@
 import random
 import pygame
 import os
+import copy
 
 pygame.init()
 pygame.display.init()
@@ -245,7 +246,7 @@ class Deck:
 
     def add(self, card: Card):
         self.cards.append(card)
-        
+
     def remove(self, card: Card):
         if card in self.cards:
             self.cards.remove(card)
@@ -260,7 +261,7 @@ class Deck:
 
     def draw(self, count: int = 1):
         if count > 0:
-            drawn_cards = [random.choice(ALL_CARDS) for _ in range(count)]
+            drawn_cards = [randomCard() for _ in range(count)]
             self.cards.extend(drawn_cards)
         elif count < 0:
             for _ in range(-count):
@@ -269,7 +270,7 @@ class Deck:
 
     def clear(self):
         self.cards = []
-    
+
     def count(self):
         return len(self.cards)
 
@@ -281,6 +282,10 @@ class Deck:
 
     def __repr__(self):
         return f"Deck with {len(self.cards)} cards"
+
+
+def randomCard():
+    return copy.deepcopy(random.choice(ALL_CARDS))
 
 
 pygame.quit()

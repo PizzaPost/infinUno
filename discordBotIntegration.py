@@ -28,7 +28,7 @@ def init(bot):
     )
     async def infinUnoRandomDeckPreview(ctx):
         """Generates a random deck and sends it as an image."""
-        last_played_card = random.choice(cards.ALL_CARDS)  # Randomly select a card
+        last_played_card = cards.randomCard()
         window = visuals.Window(
             "InfinUno Deck Preview", pygame.display.set_mode((800, 600), pygame.HIDDEN)
         )
@@ -198,7 +198,7 @@ def init(bot):
                 self.window = visuals.Window(
                     "InfinUno", pygame.display.set_mode((800, 600), pygame.HIDDEN)
                 )
-                self.last_played_card = random.choice(cards.ALL_CARDS)
+                self.last_played_card = cards.randomCard()
                 self.nextMessageContent = ""
                 self.current_player_index = (
                     -1
