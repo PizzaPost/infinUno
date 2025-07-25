@@ -129,6 +129,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
             name=color + "+2",
             color=color,
             add=2,
+            skip=True,
             image=getImageList(
                 [
                     f"resources/cards/base/{color}.png",
