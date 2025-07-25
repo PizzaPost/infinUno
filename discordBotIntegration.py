@@ -218,6 +218,7 @@ def init(bot):
             async def gameTick(self):
                 self.nextMessageContent = ""
                 gameFinished = False
+                preventFurtherPlay = False
                 current_player = self.players[self.current_player_index]
 
                 # Gather all target players affected by the last played card
@@ -229,7 +230,11 @@ def init(bot):
                     target_players.append(self.players[target_index])
 
                 # Handle stacking draw cards
-                if self.drawCounter != 0 or self.last_played_card.add != 0 or self.last_played_card.mult != 1.0:
+                if (
+                    self.drawCounter != 0
+                    or self.last_played_card.add != 0
+                    or self.last_played_card.mult != 1.0
+                ):
                     if self.drawCounter == 0:
                         if self.last_played_card.add != 0:
                             self.drawCounter = self.last_played_card.add
@@ -239,7 +244,8 @@ def init(bot):
                                 )
                         elif self.last_played_card.mult != 1.0:
                             self.drawCounter = int(
-                                current_player.hand.count() * self.last_played_card.mult - current_player.hand.count()
+                                current_player.hand.count() * self.last_played_card.mult
+                                - current_player.hand.count()
                             )
                     self.nextMessageContent += (
                         f"\nThere was an existing draw counter of {self.drawCounter}."
@@ -255,6 +261,7 @@ def init(bot):
                             # Let the player stack (this is a placeholder for actual interaction)
                             # later, we'll prompt the player to play a stackable card
                             # For now, just play the first stackable card
+                            preventFurtherPlay = True
                             played_card = stackable[0]
                             self.nextMessageContent += f"\n{current_player.name} automatically played their first stackable card: {played_card.name}."
                             target.hand.remove(played_card)
@@ -276,7 +283,9 @@ def init(bot):
                         self.drawCounter = 0  # Reset draw counter
 
                 # Check skip indicator
-                if self.last_played_card.skip and current_player in target_players:
+                if preventFurtherPlay:
+                    pass  # we have already played a card, so we cannot play another one
+                elif self.last_played_card.skip and current_player in target_players:
                     self.nextMessageContent += (
                         f"\n{current_player.name} could not do anything further."
                     )
