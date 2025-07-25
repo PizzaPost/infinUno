@@ -39,27 +39,28 @@ class Card:
         self.color = color
         self.nextColor = nextColor if nextColor is not None else color
 
-        img = self.loadResource(image[0]).convert_alpha()
+        img = loadResource(image[0]).convert_alpha()
         for img_path in image[1:]:
             try:
-                overlay_img = self.loadResource(img_path).convert_alpha()
+                overlay_img = loadResource(img_path).convert_alpha()
                 img.blit(overlay_img, (0, 0))
             except Exception as e:
-                img = self.loadResource("resources/icon.png").convert_alpha()
+                img = loadResource("resources/icon.png").convert_alpha()
                 break
         self.image = img
-
-    def loadResource(self, img_path):
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        if not os.path.isabs(img_path):
-            img_path = os.path.join(base_dir, img_path)
-        return pygame.image.load(img_path)
 
     def __str__(self):
         return self.name
 
     def __repr__(self):
         return self.name
+
+
+def loadResource(img_path):
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    if not os.path.isabs(img_path):
+        img_path = os.path.join(base_dir, img_path)
+    return pygame.image.load(img_path)
 
 
 ALL_CARDS = []

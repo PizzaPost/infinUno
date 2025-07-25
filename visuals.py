@@ -16,7 +16,7 @@ class Window:
         self.width = pygame.display.Info().current_w
         self.height = pygame.display.Info().current_h
         self.name = name
-        self.icon = pygame.image.load("resources/icon.png")
+        self.icon = cards.loadResource("resources/icon.png")
         self.window = pygame.display.set_mode(
             (pygame.display.Info().current_w, pygame.display.Info().current_h),
             pygame.SCALED,
