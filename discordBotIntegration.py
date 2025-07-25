@@ -1,3 +1,4 @@
+import random
 from . import main, cards, players, visuals
 import discord
 from discord import ui, Interaction, ButtonStyle
@@ -71,14 +72,12 @@ def init(bot):
                 )
 
                 pygame.init()
-                window = visuals.Window("InfinUno", pygame.display.set_mode((1920, 1080), pygame.HIDDEN))
+                window = visuals.Window("InfinUno", pygame.display.set_mode((800, 600), pygame.HIDDEN))
                 for player in self.players:
                     deck_image = visuals.deckImage(window, player.hand)
-                    print(deck_image)
                     pygame.image.save(deck_image, "temp_deck.png")
                     with open("temp_deck.png", "rb") as img_file:
                         await player.player.send(file=discord.File(img_file, filename="your_deck.png"))  # type: ignore
-                    print(f"Sent deck to {player.name}.")
                 pygame.quit()
 
         view = JoinView(ctx.user)
