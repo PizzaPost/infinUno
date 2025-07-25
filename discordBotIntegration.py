@@ -47,10 +47,8 @@ def init(bot):
                 await self.message.edit(view=None)
 
         view = JoinView(ctx.user)
-        msg = await ctx.response.send_message(
+        await ctx.response.send_message(
             "Press **Join/Leave** to participate in InfinUno. The host can press **Start** when ready.",
             view=view
         )
-        view.message = await msg.original_response()
-        
-        
+        view.message = await ctx.original_response()
