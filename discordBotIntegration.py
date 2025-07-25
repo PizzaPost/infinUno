@@ -158,14 +158,6 @@ def init(bot):
                 except ValueError:
                     pass
 
-                self.drawCounter += (
-                    self.last_played_card.add
-                )  # add first, then multiply for more adding influence when also multiplying
-                self.drawCounter *= self.last_played_card.mult
-                self.drawCounter = int(
-                    self.drawCounter
-                )  # Ensure drawCounter is an integer
-
                 # Send initial deck image to all players with leave button
                 for player in self.players:
                     img_bytes = renderGameStateBytes(
@@ -239,7 +231,13 @@ def init(bot):
                 # Handle stacking draw cards
                 if self.drawCounter != 0 or self.last_played_card.add != 0 or self.last_played_card.mult != 1.0:
                     if self.drawCounter == 0:
-                        if self.last_played_card.mult != 1.0:
+                        if self.last_played_card.add != 0:
+                            self.drawCounter = self.last_played_card.add
+                            if self.last_played_card.mult != 1.0:
+                                self.drawCounter = int(
+                                    self.drawCounter * self.last_played_card.mult
+                                )
+                        elif self.last_played_card.mult != 1.0:
                             self.drawCounter = int(
                                 current_player.hand.count * self.last_played_card.mult - current_player.hand.count
                             )
