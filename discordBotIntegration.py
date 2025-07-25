@@ -77,6 +77,19 @@ def init(bot):
                                 await result  # type: ignore
                             except Exception:
                                 pass
+                    # Host left: assign new host if possible, else abort
+                    if self.parent.host == self.player:
+                        if len(self.parent.players) >= 2:
+                            import random
+                            self.parent.host = random.choice(self.parent.players)
+                            if self.parent.message:
+                                await self.parent.message.edit(content=f"Host has left. New host is {getattr(self.parent.host, 'display_name', str(self.parent.host))}.", view=self.parent)
+                        else:
+                            if self.parent.message:
+                                await self.parent.message.edit(content="Host has left and not enough players remain. Lobby aborted.", view=None)
+                            self.parent.players.clear()
+                            self.parent.host = None
+                    
                     # Remove restart button if all players or just the host have left
                     if (not self.parent.players) or (self.parent.host not in self.parent.players):
                         if hasattr(self.parent, 'restart_message') and self.parent.restart_message:
@@ -96,11 +109,24 @@ def init(bot):
                 self.start_button = ui.Button(
                     label="Start", style=ButtonStyle.success, disabled=True
                 )
+                self.abort_button = ui.Button(label="Abort", style=ButtonStyle.danger)
+                self.abort_button.callback = self.abort_callback
                 self.join_button.callback = self.join_callback
                 self.start_button.callback = self.start_callback
+                self.add_item(self.abort_button)
                 self.add_item(self.join_button)
                 self.add_item(self.start_button)
                 self.message = None
+            
+            async def abort_callback(self, interaction: Interaction):
+                if interaction.user != self.host:
+                    await interaction.response.send_message("Only the host can abort the lobby.", ephemeral=True)
+                    return
+                await interaction.response.send_message("Lobby aborted.", ephemeral=False)
+                if self.message:
+                    await self.message.edit(content="Lobby aborted.", view=None) # type: ignore
+                self.players.clear()
+                self.host = None
 
             async def join_callback(self, interaction: Interaction):
                 user = interaction.user
