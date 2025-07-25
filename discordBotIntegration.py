@@ -1,18 +1,27 @@
-from . import main
+from . import main, cards, players, visuals
 import discord
 from discord import ui, Interaction, ButtonStyle
+import asyncio
+import pygame
+import io
+
 
 def init(bot):
-    @bot.tree.command(name='infinuno')
+    @bot.tree.command(name="infinuno")
     async def infinUno(ctx):
         """Starts the InfinUno game."""
+
         class JoinView(ui.View):
             def __init__(self, host):
                 super().__init__(timeout=None)
                 self.players = set()
                 self.host = host
-                self.join_button = ui.Button(label="Join/Leave", style=ButtonStyle.primary)
-                self.start_button = ui.Button(label="Start", style=ButtonStyle.success, disabled=True)
+                self.join_button = ui.Button(
+                    label="Join/Leave", style=ButtonStyle.primary
+                )
+                self.start_button = ui.Button(
+                    label="Start", style=ButtonStyle.success, disabled=True
+                )
                 self.join_button.callback = self.join_callback
                 self.start_button.callback = self.start_callback
                 self.add_item(self.join_button)
@@ -22,33 +31,59 @@ def init(bot):
             async def join_callback(self, interaction: Interaction):
                 user = interaction.user
                 if user in self.players:
-                    self.players.remove(user)
-                    await interaction.response.send_message("You left the game.", ephemeral=True)
+                    self.players.remove(user) # type: ignore
+                    await interaction.response.send_message(
+                        "You left the game.", ephemeral=True
+                    )
                 else:
-                    self.players.add(user)
-                    await interaction.response.send_message("You joined the game.", ephemeral=True)
-                self.start_button.disabled = len(self.players) == 0 or self.host not in self.players
-                await self.message.edit(view=self) # type: ignore
+                    self.players.add(user) # type: ignore
+                    await interaction.response.send_message(
+                        "You joined the game.", ephemeral=True
+                    )
+                self.start_button.disabled = (
+                    len(self.players) == 0 or self.host not in self.players
+                )
+                await self.message.edit(view=self)  # type: ignore
 
             async def start_callback(self, interaction: Interaction):
                 if interaction.user != self.host:
-                    await interaction.response.send_message("Only the host can start the game.", ephemeral=True)
+                    await interaction.response.send_message(
+                        "Only the host can start the game.", ephemeral=True
+                    )
                     return
                 if len(self.players) == 0:
-                    await interaction.response.send_message("No players have joined.", ephemeral=True)
+                    await interaction.response.send_message(
+                        "No players have joined.", ephemeral=True
+                    )
                     return
-                await interaction.response.send_message("Game started! Check your DMs.", ephemeral=True)
-                for player in self.players:
-                    try:
-                        await player.send("The InfinUno game is starting!")
-                    except Exception:
-                        pass
+                # Start the game in a new task to continue independently of the start message
+                asyncio.create_task(self.gameStart(interaction))
                 self.stop()
-                await self.message.edit(view=None) # type: ignore
+                await self.message.edit(view=None)  # type: ignore
+
+            async def gameStart(self, interaction):
+                playerClasses = [players.Player(player) for player in self.players]
+                self.players = playerClasses
+                player_names = ", ".join(p.name for p in self.players)
+                gameStartedMessage = f"Game started! {player_names}, check your DMs."
+                await interaction.response.send_message(
+                    gameStartedMessage, ephemeral=False
+                )
+
+                pygame.init()
+                window = visuals.Window("InfinUno", pygame.display.set_mode((1920, 1080), pygame.HIDDEN))
+                for player in self.players:
+                    deck_image = visuals.deckImage(window, player.hand)
+                    print(deck_image)
+                    pygame.image.save(deck_image, "temp_deck.png")
+                    with open("temp_deck.png", "rb") as img_file:
+                        await player.player.send(file=discord.File(img_file, filename="your_deck.png"))  # type: ignore
+                    print(f"Sent deck to {player.name}.")
+                pygame.quit()
 
         view = JoinView(ctx.user)
         await ctx.response.send_message(
             "Press **Join/Leave** to participate in InfinUno. The host can press **Start** when ready.",
-            view=view
+            view=view,
         )
         view.message = await ctx.original_response()

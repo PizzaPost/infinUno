@@ -1,5 +1,15 @@
+from . import cards
+
+
 class Player:
-    def __init__(self, name: str):
-        self.name = name
-        self.hand = []
+    def __init__(self, playerInstance=None, name=""):
+        self.name = playerInstance.name if playerInstance is not None else name
+        self.hand = cards.Deck(7)
         self.bot = False
+        self.player = playerInstance
+
+    def __repr__(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
