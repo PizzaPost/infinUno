@@ -251,7 +251,7 @@ class Deck:
             self.cards.remove(card)
 
     def sort(self):
-        self.cards.sort(key=lambda x: (x.color, x.name))
+        self.cards.sort(key=lambda x: x.name)
 
     def drawFrom(self, index: int = 0):
         if self.cards and 0 <= index < len(self.cards):
