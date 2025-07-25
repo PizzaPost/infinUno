@@ -110,8 +110,11 @@ def init(bot):
                 self.num_players = len(self.players)
                 self.drawCounter = 0
                 
-                self.last_played_card.affects.remove(0)  # Remove the game itself from affects of this first card
-                
+                try:
+                    self.last_played_card.affects.remove(0)  # Remove the game itself from affects of this first card
+                except ValueError:
+                    pass
+
                 self.drawCounter += self.last_played_card.add  # add first, then multiply for more adding influence when also multiplying
                 self.drawCounter *= self.last_played_card.mult
                 
@@ -124,7 +127,9 @@ def init(bot):
                         file=discord.File(img_bytes, filename="your_deck.png")
                     )
 
-                await self.gameTick()
+                gameFinished = False
+                while not gameFinished:
+                    gameFinished = await self.gameTick()
 
                 pygame.quit()
 
