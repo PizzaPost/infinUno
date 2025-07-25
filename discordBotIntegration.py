@@ -32,12 +32,12 @@ def init(bot):
             async def join_callback(self, interaction: Interaction):
                 user = interaction.user
                 if user in self.players:
-                    self.players.remove(user) # type: ignore
+                    self.players.remove(user)  # type: ignore
                     await interaction.response.send_message(
                         "You left the game.", ephemeral=True
                     )
                 else:
-                    self.players.add(user) # type: ignore
+                    self.players.add(user)  # type: ignore
                     await interaction.response.send_message(
                         "You joined the game.", ephemeral=True
                     )
@@ -72,9 +72,13 @@ def init(bot):
                 )
 
                 pygame.init()
-                window = visuals.Window("InfinUno", pygame.display.set_mode((800, 600), pygame.HIDDEN))
+                window = visuals.Window(
+                    "InfinUno", pygame.display.set_mode((800, 600), pygame.HIDDEN)
+                )
+                last_played_card = random.choice(cards.ALL_CARDS)
                 for player in self.players:
                     deck_image = visuals.deckImage(window, player.hand)
+                    deck_image.blit(last_played_card.image, (deck_image.get_width() // 2 - last_played_card.image.get_width() // 2, 10))
                     pygame.image.save(deck_image, "temp_deck.png")
                     with open("temp_deck.png", "rb") as img_file:
                         await player.player.send(file=discord.File(img_file, filename="your_deck.png"))  # type: ignore
