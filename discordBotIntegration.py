@@ -144,6 +144,7 @@ def init(bot):
 
                 self.drawCounter += self.last_played_card.add  # add first, then multiply for more adding influence when also multiplying
                 self.drawCounter *= self.last_played_card.mult
+                self.drawCounter = int(self.drawCounter)  # Ensure drawCounter is an integer
 
                 # Send initial deck image to all players with leave button
                 for player in self.players:
