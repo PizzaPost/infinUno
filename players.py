@@ -2,9 +2,9 @@ from . import cards
 
 
 class Player:
-    def __init__(self, playerInstance=None, name=""):
+    def __init__(self, playerInstance=None, name="", hand=None):
         self.name = playerInstance.name if playerInstance is not None else name
-        self.hand = cards.Deck(7)
+        self.hand = hand if hand is not None else cards.Deck(7)
         self.bot = False
         self.player = playerInstance
 
