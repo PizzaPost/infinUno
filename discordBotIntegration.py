@@ -232,8 +232,8 @@ def init(bot):
                     if not stackableFound:
                         for target in target_players:
                             target.hand.draw(self.drawCounter)
-                            self.drawCounter = 0  # Reset draw counter
                         self.nextMessageContent += f"\n{", ".join([target.name for target in target_players])} drew {self.drawCounter} cards."
+                        self.drawCounter = 0  # Reset draw counter
 
                 # Check skip indicator
                 if self.last_played_card.skip and current_player in target_players:
@@ -268,11 +268,11 @@ def init(bot):
                     leave_view = self.LeaveView(self, player)
                     # Instead of sending a new message, edit the previous one with the updated image and leave button
                     if hasattr(player, "deck_message") and player.deck_message:
-                        await player.deck_message.edit(content=f"{self.nextMessageContent}", attachments=[discord.File(img_bytes, filename="your_deck.png")], view=leave_view)
+                        player.deck_message = await player.deck_message.edit(content=f"{self.nextMessageContent}", attachments=[discord.File(img_bytes, filename="your_deck.png")], view=leave_view)
                         leave_view.message = player.deck_message
                     else:
                         msg = await player.player.send(content=f"This is your deck.{self.nextMessageContent}", file=discord.File(img_bytes, filename="your_deck.png"), view=leave_view)  # type: ignore
-                        setattr(player, 'deck_message', msg)
+                        player.deck_message = msg
                         leave_view.message = msg
 
                 # Update current player index for the next turn
