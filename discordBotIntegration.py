@@ -143,7 +143,7 @@ def init(bot):
                 self.start_button.disabled = (
                     len(self.players) == 0 or self.host not in self.players
                 )
-                await self.message.edit(view=self)  # type: ignore
+                await self.message.edit(content=f"Players: {', '.join(p.name for p in self.players)}", view=self)  # type: ignore
 
             async def start_callback(self, interaction: Interaction):
                 if interaction.user != self.host:
