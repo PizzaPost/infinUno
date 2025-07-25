@@ -191,6 +191,7 @@ def init(bot):
                 view.message = msg
 
             async def gameTick(self):
+                self.nextMessageContent = ""
                 gameFinished = False
                 current_player = self.players[self.current_player_index]
 
@@ -204,6 +205,7 @@ def init(bot):
 
                 # Handle stacking draw cards
                 if self.drawCounter != 0:
+                    self.nextMessageContent += f"\nThere was an existing draw counter of {self.drawCounter}."
                     stackableFound = False
                     for target in target_players:
                         # Find stackable cards in target's hand
@@ -216,12 +218,14 @@ def init(bot):
                             # In a real implementation, you'd prompt the player to play a stackable card
                             # For now, just play the first stackable card
                             played_card = stackable[0]
+                            self.nextMessageContent += f"\nYou automatically played your first stackable card: {played_card.name}."
                             target.hand.remove(played_card)
                             self.last_played_card = played_card
                             # Update drawCounter
                             self.drawCounter = int(
                                 (self.drawCounter + played_card.add) * played_card.mult  # add first, then multiply for more adding influence when also multiplying
                             )
+                            self.nextMessageContent += f"\nThe draw counter is now {self.drawCounter}."
                             stackableFound = True
                             break
                     if not stackableFound:
@@ -231,10 +235,12 @@ def init(bot):
 
                 # Check skip indicator
                 if self.last_played_card.skip and current_player in target_players:
+                    self.nextMessageContent += f"\nYou were skipped."
                     # we just got skipped. Because this card will also be the last played card for the next player, we must adjust the affects of this card by pushing every value down by one
                     self.last_played_card.affects = [a - 1 for a in self.last_played_card.affects]
                 else:
                     # enable the current player to play a card
+                    self.nextMessageContent += f"\nYou may now play a card. (But for now, the game ends here.)"
                     gameFinished = True # For now, we end the game as soon as a card can be played by the player
 
                 # Send update deck image to the current player
@@ -261,7 +267,7 @@ def init(bot):
                         await player.deck_message.edit(attachments=[discord.File(img_bytes, filename="your_deck.png")], view=leave_view)
                         leave_view.message = player.deck_message
                     else:
-                        msg = await player.player.send(file=discord.File(img_bytes, filename="your_deck.png"), view=leave_view)  # type: ignore
+                        msg = await player.player.send(content=f"This is your deck.{self.nextMessageContent}", file=discord.File(img_bytes, filename="your_deck.png"), view=leave_view)  # type: ignore
                         setattr(player, 'deck_message', msg)
                         leave_view.message = msg
 
