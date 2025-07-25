@@ -81,7 +81,7 @@ def init(bot):
                     if (not self.parent.players) or (self.parent.host not in self.parent.players):
                         if hasattr(self.parent, 'restart_message') and self.parent.restart_message:
                             try:
-                                await self.parent.restart_message.edit(view=None)
+                                await self.parent.restart_message.edit(content="Host has left the game. Restarting is no longer available.", view=None)
                             except Exception:
                                 pass
                         self.parent.restart_message = None
