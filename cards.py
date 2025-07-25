@@ -243,8 +243,12 @@ class Deck:
         if cardCount > 0:
             self.draw(cardCount)
 
-    def add_card(self, card: Card):
+    def add(self, card: Card):
         self.cards.append(card)
+        
+    def remove(self, card: Card):
+        if card in self.cards:
+            self.cards.remove(card)
 
     def sort(self):
         self.cards.sort(key=lambda x: (x.color, x.name))
