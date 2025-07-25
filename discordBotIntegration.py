@@ -77,6 +77,14 @@ def init(bot):
                                 await result  # type: ignore
                             except Exception:
                                 pass
+                    # Remove restart button if all players or just the host have left
+                    if (not self.parent.players) or (self.parent.host not in self.parent.players):
+                        if hasattr(self.parent, 'restart_message') and self.parent.restart_message:
+                            try:
+                                await self.parent.restart_message.edit(view=None)
+                            except Exception:
+                                pass
+                        self.parent.restart_message = None
 
             def __init__(self, host):
                 super().__init__(timeout=None)
@@ -214,6 +222,7 @@ def init(bot):
                     f"Game finished! Host can restart the game.", view=view
                 )
                 view.message = msg
+                self.restart_message = msg
 
             async def gameTick(self):
                 self.nextMessageContent = ""
