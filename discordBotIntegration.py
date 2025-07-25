@@ -234,7 +234,7 @@ def init(bot):
                             )
                             return
                         elif interaction.user not in self.parent.players:
-                            await interaction.followup.send(
+                            await interaction.response.send_message(
                                 "You, the host, are not in the game. Cannot restart. Aborting game.", ephemeral=True
                             )
                             await self.message.edit(content=f"{self.parent.host} has somehow left the game without losing host status. Game aborted.", view=None)  # type: ignore
