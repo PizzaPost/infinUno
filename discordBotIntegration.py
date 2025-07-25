@@ -150,9 +150,10 @@ def init(bot):
                     stackableFound = False
                     for target in target_players:
                         # Find stackable cards in target's hand
-                        stackable = [
-                            c for c in target.hand if c.add != 0 or c.mult != 1.0
-                        ]
+                        stackable = []
+                        for c in target.hand.cards:
+                            if c.add != 0 or c.mult != 1.0:
+                                stackable.append(c)
                         if stackable:
                             # Let the player stack (this is a placeholder for actual interaction)
                             # In a real implementation, you'd prompt the player to play a stackable card
