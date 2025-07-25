@@ -233,12 +233,17 @@ def init(bot):
                                 "Only the host can restart the game.", ephemeral=True
                             )
                             return
+                        elif interaction.user not in self.parent.players:
+                            await interaction.followup.send(
+                                "You, the host, are not in the game. Cannot restart. Aborting game.", ephemeral=True
+                            )
+                            await self.message.edit(content=f"{self.parent.host} has somehow left the game without losing host status. Game aborted.", view=None)  # type: ignore
+                            await asyncio.sleep(1)  # Give the message time to update
+                            self.parent.players.clear()
+                            self.parent.host = None
+                            return
                         await interaction.response.defer()
                         # Restart the game with the same players
-                        self.parent.players = [
-                            p.player if hasattr(p, "player") else p
-                            for p in self.parent.players
-                        ]
                         asyncio.create_task(self.parent.gameStart(interaction))
                         self.stop()
                         await self.message.edit(view=None)  # type: ignore
