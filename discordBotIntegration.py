@@ -239,7 +239,9 @@ def init(bot):
                 if self.last_played_card.skip and current_player in target_players:
                     self.nextMessageContent += f"\nYou were skipped."
                     # we just got skipped. Because this card will also be the last played card for the next player, we must adjust the affects of this card by pushing every value down by one
-                    self.last_played_card.affects = [a - 1 for a in self.last_played_card.affects]
+                    self.last_played_card.affects = [a - 1 for a in self.last_played_card.affects if a - 1 >= 0]
+                    # we remove negative values, because with more players, the probability of this card laying long enough to skip someone from the end of the list decreases enough for us to just not respect you playing it.
+                    # DO NOT remove removing negative values, as that will cause the game to get stuck in an infinite loop when there are not more players than affected targets.
                 else:
                     # enable the current player to play a card
                     self.nextMessageContent += f"\nYou may now play a card. (But for now, the game ends here.)"
