@@ -50,6 +50,18 @@ class Card:
                 break
         self.image = img
 
+    def __deepcopy__(self, memo={}):
+        # Custom deepcopy to avoid copying pygame.Surface
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            if k == "image":
+                setattr(result, k, v)  # shallow copy for pygame.Surface
+            else:
+                setattr(result, k, copy.deepcopy(v, memo))
+        return result
+
     def __str__(self):
         return self.name
 
@@ -285,7 +297,7 @@ class Deck:
 
 
 def randomCard():
-    return copy.deepcopy(random.choice(ALL_CARDS))
+    return random.choice(ALL_CARDS).__deepcopy__()
 
 
 pygame.quit()
