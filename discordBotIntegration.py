@@ -307,15 +307,18 @@ def init(bot):
                     if self.drawCounter == 0:
                         if self.last_played_card.add != 0:
                             self.drawCounter = self.last_played_card.add
+                            self.last_played_card.add = 0  # Remove the add from the card
                             if self.last_played_card.mult != 1.0:
                                 self.drawCounter = int(
                                     self.drawCounter * self.last_played_card.mult
                                 )
+                                self.last_played_card.mult = 1.0  # Reset multiplier after applying
                         elif self.last_played_card.mult != 1.0:
                             self.drawCounter = int(
                                 current_player.hand.count() * self.last_played_card.mult
                                 - current_player.hand.count()
                             )
+                            self.last_played_card.mult = 1.0  # Reset multiplier after applying
                     self.nextMessageContent += (
                         f"\nThere was an existing draw counter of {self.drawCounter}."
                     )
