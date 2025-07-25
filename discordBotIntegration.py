@@ -268,7 +268,7 @@ def init(bot):
                     leave_view = self.LeaveView(self, player)
                     # Instead of sending a new message, edit the previous one with the updated image and leave button
                     if hasattr(player, "deck_message") and player.deck_message:
-                        await player.deck_message.edit(content=f"This is your deck.{self.nextMessageContent}", attachments=[discord.File(img_bytes, filename="your_deck.png")], view=leave_view)
+                        await player.deck_message.edit(content=f"{self.nextMessageContent}", attachments=[discord.File(img_bytes, filename="your_deck.png")], view=leave_view)
                         leave_view.message = player.deck_message
                     else:
                         msg = await player.player.send(content=f"This is your deck.{self.nextMessageContent}", file=discord.File(img_bytes, filename="your_deck.png"), view=leave_view)  # type: ignore
