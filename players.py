@@ -7,6 +7,7 @@ class Player:
         self.hand = hand if hand is not None else cards.Deck(7)
         self.bot = False
         self.player = playerInstance
+        self.deck_message = None
 
     def __repr__(self):
         return self.name

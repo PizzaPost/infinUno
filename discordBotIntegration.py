@@ -260,20 +260,18 @@ def init(bot):
                     setattr(current_player, 'deck_message', msg)
                     leave_view.message = msg
 
-                # Send updated deck image to all target players
-                for player in target_players:
-                    img_bytes = renderGameStateBytes(
-                        self.window, self.last_played_card, player
-                    )
-                    leave_view = self.LeaveView(self, player)
-                    # Instead of sending a new message, edit the previous one with the updated image and leave button
-                    if hasattr(player, "deck_message") and player.deck_message:
-                        player.deck_message = await player.deck_message.edit(content=f"{self.nextMessageContent}", attachments=[discord.File(img_bytes, filename="your_deck.png")], view=leave_view)
-                        leave_view.message = player.deck_message
-                    else:
-                        msg = await player.player.send(content=f"This is your deck.{self.nextMessageContent}", file=discord.File(img_bytes, filename="your_deck.png"), view=leave_view)  # type: ignore
-                        player.deck_message = msg
-                        leave_view.message = msg
+                img_bytes = renderGameStateBytes(
+                    self.window, self.last_played_card, current_player
+                )
+                leave_view = self.LeaveView(self, current_player)
+                # Instead of sending a new message, edit the previous one with the updated image and leave button
+                if current_player.deck_message:
+                    current_player.deck_message = await current_player.deck_message.edit(content=f"{self.nextMessageContent}", attachments=[discord.File(img_bytes, filename="your_deck.png")], view=leave_view) # type: ignore
+                    leave_view.message = current_player.deck_message
+                else:
+                    msg = await current_player.player.send(content=f"This is your deck.{self.nextMessageContent}", file=discord.File(img_bytes, filename="your_deck.png"), view=leave_view)  # type: ignore
+                    current_player.deck_message = msg
+                    leave_view.message = msg
 
                 # Update current player index for the next turn
                 self.current_player_index = (self.current_player_index + 1) % self.num_players
