@@ -5,12 +5,18 @@ from discord import ui, Interaction, ButtonStyle
 import asyncio
 import pygame
 import io
+from PIL import Image
 
 
 def renderGameStateBytes(window, last_played_card, player):
     deck_image = visuals.renderGameState(window, last_played_card, player)
+    # Convert pygame surface to string buffer
+    data = pygame.image.tostring(deck_image, "RGBA")
+    size = deck_image.get_size()
+    # Create PIL Image
+    image = Image.frombytes("RGBA", size, data)
     img_bytes = io.BytesIO()
-    pygame.image.save(deck_image, img_bytes)
+    image.save(img_bytes, format="PNG")
     img_bytes.seek(0)
     return img_bytes
 
@@ -21,7 +27,13 @@ def init(bot):
         description="Display a random infinUno deck with a random starting card.",
     )
     async def infinUnoRandomDeckPreview(ctx):
-        ctx.response.send_message()
+        """Generates a random deck and sends it as an image."""
+        last_played_card = random.choice(cards.ALL_CARDS)  # Randomly select a card
+        window = visuals.Window(
+            "InfinUno Deck Preview", pygame.display.set_mode((800, 600), pygame.HIDDEN)
+        )
+        img_bytes = renderGameStateBytes(window, last_played_card, players.Player())
+        await ctx.send(file=discord.File(img_bytes, filename="your_deck.png"))
 
     @bot.tree.command(name="infinuno")
     async def infinUno(ctx):
@@ -30,7 +42,7 @@ def init(bot):
         class JoinView(ui.View):
             def __init__(self, host):
                 super().__init__(timeout=None)
-                self.players = set()
+                self.players = []
                 self.host = host
                 self.join_button = ui.Button(
                     label="Join/Leave", style=ButtonStyle.primary
@@ -52,7 +64,7 @@ def init(bot):
                         "You left the game.", ephemeral=True
                     )
                 else:
-                    self.players.add(user)  # type: ignore
+                    self.players.append(user)  # type: ignore
                     await interaction.response.send_message(
                         "You joined the game.", ephemeral=True
                     )
@@ -87,14 +99,99 @@ def init(bot):
                 )
 
                 pygame.init()
-                window = visuals.Window(
+                self.window = visuals.Window(
                     "InfinUno", pygame.display.set_mode((800, 600), pygame.HIDDEN)
                 )
-                last_played_card = random.choice(cards.ALL_CARDS)
+                self.last_played_card = random.choice(cards.ALL_CARDS)
+                self.nextMessageContent = ""
+                self.current_player_index = (
+                    -1
+                )  # Since the last card was played by the game itself
+                self.num_players = len(self.players)
+                self.drawCounter = 0
+                
+                self.last_played_card.affects.remove(0)  # Remove the game itself from affects of this first card
+                
+                self.drawCounter += self.last_played_card.add  # add first, then multiply for more adding influence when also multiplying
+                self.drawCounter *= self.last_played_card.mult
+                
+                # Send initial deck image to all players
                 for player in self.players:
-                    img_bytes = renderGameStateBytes(window, last_played_card, player)
-                    await player.player.send(file=discord.File(img_bytes, filename="your_deck.png"))  # type: ignore
+                    img_bytes = renderGameStateBytes(
+                        self.window, self.last_played_card, player
+                    )
+                    player.deck_message = await player.player.send(  # type: ignore
+                        file=discord.File(img_bytes, filename="your_deck.png")
+                    )
+
+                await self.gameTick()
+
                 pygame.quit()
+
+            async def gameTick(self):
+                gameFinished = False
+                
+                # Gather all target players affected by the last played card
+                target_players = []
+                for offset in self.last_played_card.affects:
+                    target_index = (
+                        self.current_player_index + offset
+                    ) % self.num_players
+                    target_players.append(self.players[target_index])
+
+                # Handle stacking draw cards
+                if self.drawCounter != 0:
+                    stackableFound = False
+                    for target in target_players:
+                        # Find stackable cards in target's hand
+                        stackable = [
+                            c for c in target.hand if c.add != 0 or c.mult != 1.0
+                        ]
+                        if stackable:
+                            # Let the player stack (this is a placeholder for actual interaction)
+                            # In a real implementation, you'd prompt the player to play a stackable card
+                            # For now, just play the first stackable card
+                            played_card = stackable[0]
+                            target.hand.remove(played_card)
+                            self.last_played_card = played_card
+                            # Update drawCounter
+                            self.drawCounter = int(
+                                (self.drawCounter + played_card.add) * played_card.mult  # add first, then multiply for more adding influence when also multiplying
+                            )
+                            stackableFound = True
+                            break
+                    if not stackableFound:
+                        for target in target_players:
+                            target.hand.draw(self.drawCounter)
+                            self.drawCounter = 0  # Reset draw counter
+
+                # Check skip indicator
+                if self.last_played_card.skip == False:
+                    # enable the current player to play a card
+                    gameFinished = True # For now, we end the game as soon as a card can be played by the user
+                
+                # Send update deck image to the current player
+                if self.current_player_index >= 0:
+                    current_player = self.players[self.current_player_index]
+                    img_bytes = renderGameStateBytes(
+                        self.window, self.last_played_card, current_player
+                    )
+                    await current_player.player.send( # type: ignore
+                        file=discord.File(img_bytes, filename="your_deck.png")
+                    )
+
+                # Send updated deck image to all target players
+                for player in target_players:
+                    img_bytes = renderGameStateBytes(
+                        self.window, self.last_played_card, player
+                    )
+                    # Instead of sending a new message, edit the previous one with the updated image
+                    if hasattr(player, "deck_message") and player.deck_message:
+                        await player.deck_message.edit(attachments=[discord.File(img_bytes, filename="your_deck.png")])
+                    else:
+                        player.deck_message = await player.player.send(file=discord.File(img_bytes, filename="your_deck.png"))  # type: ignore
+                
+                return gameFinished
 
         view = JoinView(ctx.user)
         await ctx.response.send_message(
