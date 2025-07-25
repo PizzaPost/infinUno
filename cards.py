@@ -251,8 +251,9 @@ class Deck:
             return self.cards.pop(index)
         return None
 
-    def draw(self):
-        self.cards.append(random.choice(ALL_CARDS))
+    def draw(self, count: int = 1):
+        drawn_cards = [random.choice(ALL_CARDS) for _ in range(count)]
+        self.cards.extend(drawn_cards)
 
     def clear(self):
         self.cards = []
