@@ -269,6 +269,9 @@ class Deck:
 
     def clear(self):
         self.cards = []
+    
+    def count(self):
+        return len(self.cards)
 
     def __len__(self):
         return len(self.cards)
