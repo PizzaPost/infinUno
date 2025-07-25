@@ -212,6 +212,11 @@ def init(bot):
                     )  # Remove the game itself from affects of this first card
                 except ValueError:
                     pass
+                
+                for player in self.players:
+                    await player.player.send("I will send your deck here in a few seconds.") # type: ignore
+                
+                await asyncio.sleep(5)
 
                 # Send initial deck image to all players with leave button
                 for player in self.players:
