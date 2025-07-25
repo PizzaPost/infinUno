@@ -28,7 +28,7 @@ def init(bot):
                     self.players.add(user)
                     await interaction.response.send_message("You joined the game.", ephemeral=True)
                 self.start_button.disabled = len(self.players) == 0 or self.host not in self.players
-                await self.message.edit(view=self)
+                await self.message.edit(view=self) # type: ignore
 
             async def start_callback(self, interaction: Interaction):
                 if interaction.user != self.host:
@@ -44,7 +44,7 @@ def init(bot):
                     except Exception:
                         pass
                 self.stop()
-                await self.message.edit(view=None)
+                await self.message.edit(view=None) # type: ignore
 
         view = JoinView(ctx.user)
         await ctx.response.send_message(
