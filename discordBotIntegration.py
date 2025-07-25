@@ -45,25 +45,39 @@ def init(bot):
                     super().__init__(timeout=None)
                     self.parent = parent
                     self.player = player
-                    self.leave_button = ui.Button(label="Leave", style=ButtonStyle.danger)
+                    self.leave_button = ui.Button(
+                        label="Leave", style=ButtonStyle.danger
+                    )
                     self.leave_button.callback = self.leave_callback
                     self.add_item(self.leave_button)
                     self.message = None
 
                 async def leave_callback(self, interaction: Interaction):
-                    if hasattr(self.player, 'player') and interaction.user != self.player.player:
-                        await interaction.response.send_message("You can only leave your own game.", ephemeral=True)
+                    if (
+                        hasattr(self.player, "player")
+                        and interaction.user != self.player.player
+                    ):
+                        await interaction.response.send_message(
+                            "You can only leave your own game.", ephemeral=True
+                        )
                         return
                     # Remove player from game
-                    self.parent.players = [p for p in self.parent.players if p != self.player]
-                    await interaction.response.send_message("You have left the game.", ephemeral=True)
+                    self.parent.players = [
+                        p for p in self.parent.players if p != self.player
+                    ]
+                    await interaction.response.send_message(
+                        "You have left the game.", ephemeral=True
+                    )
                     if self.message:
-                        result = self.message.edit(content="You have left the game.", attachments=[], view=None)
+                        result = self.message.edit(
+                            content="You have left the game.", attachments=[], view=None
+                        )
                         if asyncio.iscoroutine(result):
                             try:
-                                await result # type: ignore
+                                await result  # type: ignore
                             except Exception:
                                 pass
+
             def __init__(self, host):
                 super().__init__(timeout=None)
                 self.players = []
@@ -138,13 +152,19 @@ def init(bot):
                 self.drawCounter = 0
 
                 try:
-                    self.last_played_card.affects.remove(0)  # Remove the game itself from affects of this first card
+                    self.last_played_card.affects.remove(
+                        0
+                    )  # Remove the game itself from affects of this first card
                 except ValueError:
                     pass
 
-                self.drawCounter += self.last_played_card.add  # add first, then multiply for more adding influence when also multiplying
+                self.drawCounter += (
+                    self.last_played_card.add
+                )  # add first, then multiply for more adding influence when also multiplying
                 self.drawCounter *= self.last_played_card.mult
-                self.drawCounter = int(self.drawCounter)  # Ensure drawCounter is an integer
+                self.drawCounter = int(
+                    self.drawCounter
+                )  # Ensure drawCounter is an integer
 
                 # Send initial deck image to all players with leave button
                 for player in self.players:
@@ -154,12 +174,15 @@ def init(bot):
                     leave_view = self.LeaveView(self, player)
                     player.deck_message = await player.player.send(  # type: ignore
                         file=discord.File(img_bytes, filename="your_deck.png"),
-                        view=leave_view
+                        view=leave_view,
                     )
-                    leave_view.message = player.deck_message # type: ignore
+                    leave_view.message = player.deck_message  # type: ignore
 
                 gameFinished = False
                 while not gameFinished:
+                    await asyncio.sleep(
+                        2
+                    )  # give the players some time to read the last message, in case something happens fast
                     gameFinished = await self.gameTick()
 
                 print(f"{player_names}: Game of infinUno finished.")
@@ -171,24 +194,33 @@ def init(bot):
                     def __init__(self, parent):
                         super().__init__(timeout=None)
                         self.parent = parent
-                        self.restart_button = ui.Button(label="Restart Game", style=ButtonStyle.success)
+                        self.restart_button = ui.Button(
+                            label="Restart Game", style=ButtonStyle.success
+                        )
                         self.restart_button.callback = self.restart_callback
                         self.add_item(self.restart_button)
                         self.message = None
 
                     async def restart_callback(self, interaction: Interaction):
                         if interaction.user != self.parent.host:
-                            await interaction.response.send_message("Only the host can restart the game.", ephemeral=True)
+                            await interaction.response.send_message(
+                                "Only the host can restart the game.", ephemeral=True
+                            )
                             return
                         await interaction.response.defer()
                         # Restart the game with the same players
-                        self.parent.players = [p.player if hasattr(p, 'player') else p for p in self.parent.players]
+                        self.parent.players = [
+                            p.player if hasattr(p, "player") else p
+                            for p in self.parent.players
+                        ]
                         asyncio.create_task(self.parent.gameStart(interaction))
                         self.stop()
-                        await self.message.edit(view=None) # type: ignore
+                        await self.message.edit(view=None)  # type: ignore
 
                 view = RestartView(self)
-                msg = await interaction.channel.send(f"Game finished! Host can restart the game.", view=view)
+                msg = await interaction.channel.send(
+                    f"Game finished! Host can restart the game.", view=view
+                )
                 view.message = msg
 
             async def gameTick(self):
@@ -206,7 +238,9 @@ def init(bot):
 
                 # Handle stacking draw cards
                 if self.drawCounter != 0:
-                    self.nextMessageContent += f"\nThere was an existing draw counter of {self.drawCounter}."
+                    self.nextMessageContent += (
+                        f"\nThere was an existing draw counter of {self.drawCounter}."
+                    )
                     stackableFound = False
                     for target in target_players:
                         # Find stackable cards in target's hand
@@ -219,14 +253,17 @@ def init(bot):
                             # later, we'll prompt the player to play a stackable card
                             # For now, just play the first stackable card
                             played_card = stackable[0]
-                            self.nextMessageContent += f"\nYou automatically played your first stackable card: {played_card.name}."
+                            self.nextMessageContent += f"\n{current_player.name} automatically played their first stackable card: {played_card.name}."
                             target.hand.remove(played_card)
                             self.last_played_card = played_card
                             # Update drawCounter
                             self.drawCounter = int(
-                                (self.drawCounter + played_card.add) * played_card.mult  # add first, then multiply for more adding influence when also multiplying
+                                (self.drawCounter + played_card.add)
+                                * played_card.mult  # add first, then multiply for more adding influence when also multiplying
                             )
-                            self.nextMessageContent += f"\nThe draw counter is now {self.drawCounter}."
+                            self.nextMessageContent += (
+                                f"\nThe draw counter is now {self.drawCounter}."
+                            )
                             stackableFound = True
                             break
                     if not stackableFound:
@@ -237,44 +274,51 @@ def init(bot):
 
                 # Check skip indicator
                 if self.last_played_card.skip and current_player in target_players:
-                    self.nextMessageContent += f"\nYou were skipped."
+                    self.nextMessageContent += (
+                        f"\n{current_player.name} could not do anything further."
+                    )
                     # we just got skipped. Because this card will also be the last played card for the next player, we must adjust the affects of this card by pushing every value down by one
-                    self.last_played_card.affects = [a - 1 for a in self.last_played_card.affects if a - 1 >= 0]
+                    self.last_played_card.affects = [
+                        a - 1 for a in self.last_played_card.affects if a - 1 >= 0
+                    ]
                     # we remove negative values, because with more players, the probability of this card laying long enough to skip someone from the end of the list decreases enough for us to just not respect you playing it.
                     # DO NOT remove removing negative values, as that will cause the game to get stuck in an infinite loop when there are not more players than affected targets.
                 else:
                     # enable the current player to play a card
-                    self.nextMessageContent += f"\nYou may now play a card. (But for now, the game ends here.)"
-                    gameFinished = True # For now, we end the game as soon as a card can be played by the player
+                    self.nextMessageContent += f"\n{current_player.name} may now play a card. (But for now, the game ends here.)"
+                    gameFinished = True  # For now, we end the game as soon as a card can be played by the player
 
-                # Send update deck image to the current player
-                if self.current_player_index >= 0:
+                # Send all players an updated view of their deck together with the messageContent
+                for player in self.players:
                     img_bytes = renderGameStateBytes(
-                        self.window, self.last_played_card, current_player
+                        self.window, self.last_played_card, player
                     )
-                    leave_view = self.LeaveView(self, current_player)
-                    msg = await current_player.player.send( # type: ignore
-                        file=discord.File(img_bytes, filename="your_deck.png"),
-                        view=leave_view
-                    )
-                    setattr(current_player, 'deck_message', msg)
-                    leave_view.message = msg
-
-                img_bytes = renderGameStateBytes(
-                    self.window, self.last_played_card, current_player
-                )
-                leave_view = self.LeaveView(self, current_player)
-                # Instead of sending a new message, edit the previous one with the updated image and leave button
-                if current_player.deck_message:
-                    current_player.deck_message = await current_player.deck_message.edit(content=f"{self.nextMessageContent}", attachments=[discord.File(img_bytes, filename="your_deck.png")], view=leave_view) # type: ignore
-                    leave_view.message = current_player.deck_message
-                else:
-                    msg = await current_player.player.send(content=f"This is your deck.{self.nextMessageContent}", file=discord.File(img_bytes, filename="your_deck.png"), view=leave_view)  # type: ignore
-                    current_player.deck_message = msg
-                    leave_view.message = msg
+                    leave_view = self.LeaveView(self, player)
+                    content = f"{self.nextMessageContent}"
+                    if hasattr(player, "deck_message") and player.deck_message:
+                        # Edit the previous message with new image and content
+                        player.deck_message = await player.deck_message.edit(
+                            content=content,
+                            attachments=[
+                                discord.File(img_bytes, filename="your_deck.png")
+                            ],
+                            view=leave_view,
+                        )  # type: ignore
+                        leave_view.message = player.deck_message
+                    else:
+                        # Send a new message if none exists
+                        msg = await player.player.send(  # type: ignore
+                            content=f"This is your deck. {content}",
+                            file=discord.File(img_bytes, filename="your_deck.png"),
+                            view=leave_view,
+                        )
+                        player.deck_message = msg
+                        leave_view.message = msg
 
                 # Update current player index for the next turn
-                self.current_player_index = (self.current_player_index + 1) % self.num_players
+                self.current_player_index = (
+                    self.current_player_index + 1
+                ) % self.num_players
                 return gameFinished
 
         view = JoinView(ctx.user)
