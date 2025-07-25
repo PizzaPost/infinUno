@@ -18,7 +18,7 @@ def getImageList(extraImages: list[str] = []) -> list[str]:
 class Card:
     def __init__(
         self,
-        name: str,
+        name: str = "",
         add: int = 0,
         mult: float = 1.0,
         affects: list = [1],
