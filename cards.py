@@ -255,8 +255,13 @@ class Deck:
         return None
 
     def draw(self, count: int = 1):
-        drawn_cards = [random.choice(ALL_CARDS) for _ in range(count)]
-        self.cards.extend(drawn_cards)
+        if count > 0:
+            drawn_cards = [random.choice(ALL_CARDS) for _ in range(count)]
+            self.cards.extend(drawn_cards)
+        elif count < 0:
+            for _ in range(-count):
+                if self.cards:
+                    self.cards.pop(random.randint(0, len(self.cards) - 1))
 
     def clear(self):
         self.cards = []
