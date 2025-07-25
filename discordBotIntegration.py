@@ -65,9 +65,6 @@ def init(bot):
                     self.parent.players = [
                         p for p in self.parent.players if p != self.player
                     ]
-                    await interaction.response.send_message(
-                        "You have left the game.", ephemeral=True
-                    )
                     if self.message:
                         result = self.message.edit(
                             content="You have left the game.", attachments=[], view=None
