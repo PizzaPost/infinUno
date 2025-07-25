@@ -118,9 +118,12 @@ def init(bot):
                 self.players = playerClasses
                 player_names = ", ".join(p.name for p in self.players)
                 gameStartedMessage = f"Game started! {player_names}, check your DMs."
-                await interaction.response.send_message(
-                    gameStartedMessage, ephemeral=False
-                )
+                try:
+                    await interaction.response.send_message(
+                        gameStartedMessage, ephemeral=False
+                    )
+                except discord.errors.InteractionResponded:
+                    await interaction.channel.send(gameStartedMessage)
 
                 pygame.init()
                 self.window = visuals.Window(
@@ -133,7 +136,7 @@ def init(bot):
                 )  # Since the last card was played by the game itself
                 self.num_players = len(self.players)
                 self.drawCounter = 0
-                
+
                 try:
                     self.last_played_card.affects.remove(0)  # Remove the game itself from affects of this first card
                 except ValueError:
@@ -141,7 +144,7 @@ def init(bot):
 
                 self.drawCounter += self.last_played_card.add  # add first, then multiply for more adding influence when also multiplying
                 self.drawCounter *= self.last_played_card.mult
-                
+
                 # Send initial deck image to all players with leave button
                 for player in self.players:
                     img_bytes = renderGameStateBytes(
@@ -179,12 +182,9 @@ def init(bot):
                         await interaction.response.defer()
                         # Restart the game with the same players
                         self.parent.players = [p.player if hasattr(p, 'player') else p for p in self.parent.players]
-                        await self.parent.gameStart(interaction)
+                        asyncio.create_task(self.parent.gameStart(interaction))
                         self.stop()
-                        if self.message:
-                            result = self.message.edit(view=None)
-                            if asyncio.iscoroutine(result):
-                                await result # type: ignore
+                        await self.message.edit(view=None) # type: ignore
 
                 view = RestartView(self)
                 msg = await interaction.channel.send(f"Game finished! Host can restart the game.", view=view)
@@ -192,7 +192,8 @@ def init(bot):
 
             async def gameTick(self):
                 gameFinished = False
-                
+                current_player = self.players[self.current_player_index]
+
                 # Gather all target players affected by the last played card
                 target_players = []
                 for offset in self.last_played_card.affects:
@@ -229,13 +230,15 @@ def init(bot):
                             self.drawCounter = 0  # Reset draw counter
 
                 # Check skip indicator
-                if self.last_played_card.skip == False:
+                if self.last_played_card.skip and current_player in target_players:
+                    # we just got skipped. Because this card will also be the last played card for the next player, we must adjust the affects of this card by pushing every value down by one
+                    self.last_played_card.affects = [a - 1 for a in self.last_played_card.affects]
+                else:
                     # enable the current player to play a card
-                    gameFinished = True # For now, we end the game as soon as a card can be played by the user
-                
+                    gameFinished = True # For now, we end the game as soon as a card can be played by the player
+
                 # Send update deck image to the current player
                 if self.current_player_index >= 0:
-                    current_player = self.players[self.current_player_index]
                     img_bytes = renderGameStateBytes(
                         self.window, self.last_played_card, current_player
                     )
@@ -261,7 +264,9 @@ def init(bot):
                         msg = await player.player.send(file=discord.File(img_bytes, filename="your_deck.png"), view=leave_view)  # type: ignore
                         setattr(player, 'deck_message', msg)
                         leave_view.message = msg
-                
+
+                # Update current player index for the next turn
+                self.current_player_index = (self.current_player_index + 1) % self.num_players
                 return gameFinished
 
         view = JoinView(ctx.user)
