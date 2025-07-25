@@ -7,7 +7,22 @@ import pygame
 import io
 
 
+def renderGameStateBytes(window, last_played_card, player):
+    deck_image = visuals.renderGameState(window, last_played_card, player)
+    img_bytes = io.BytesIO()
+    pygame.image.save(deck_image, img_bytes)
+    img_bytes.seek(0)
+    return img_bytes
+
+
 def init(bot):
+    @bot.command(
+        name="infinunodeck",
+        description="Display a random infinUno deck with a random starting card.",
+    )
+    async def infinUnoRandomDeckPreview(ctx):
+        ctx.response.send_message()
+
     @bot.tree.command(name="infinuno")
     async def infinUno(ctx):
         """Starts the InfinUno game."""
@@ -77,11 +92,8 @@ def init(bot):
                 )
                 last_played_card = random.choice(cards.ALL_CARDS)
                 for player in self.players:
-                    deck_image = visuals.deckImage(window, player.hand)
-                    deck_image.blit(last_played_card.image, (deck_image.get_width() // 2 - last_played_card.image.get_width() // 2, 10))
-                    pygame.image.save(deck_image, "temp_deck.png")
-                    with open("temp_deck.png", "rb") as img_file:
-                        await player.player.send(file=discord.File(img_file, filename="your_deck.png"))  # type: ignore
+                    img_bytes = renderGameStateBytes(window, last_played_card, player)
+                    await player.player.send(file=discord.File(img_bytes, filename="your_deck.png"))  # type: ignore
                 pygame.quit()
 
         view = JoinView(ctx.user)

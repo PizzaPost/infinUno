@@ -85,6 +85,19 @@ def deckImage(window, deck):
     return surface
 
 
+def renderGameState(window, last_played_card, player):
+    deck_image = deckImage(window, player.hand)
+    deck_image.blit(
+        last_played_card.image,
+        (
+            deck_image.get_width() // 2 - last_played_card.image.get_width() // 2,
+            10,
+        ),
+    )
+
+    return deck_image
+
+
 if __name__ == "__main__":
     window = Window("PizzaPost")
     cardIndex = 0
