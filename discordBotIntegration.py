@@ -81,20 +81,35 @@ def init(bot):
                     if self.parent.host == self.player:
                         if len(self.parent.players) >= 2:
                             import random
+
                             self.parent.host = random.choice(self.parent.players)
                             if self.parent.message:
-                                await self.parent.message.edit(content=f"Host has left. New host is {getattr(self.parent.host, 'display_name', str(self.parent.host))}.", view=self.parent)
+                                await self.parent.message.edit(
+                                    content=f"Host has left. New host is {getattr(self.parent.host, 'display_name', str(self.parent.host))}.",
+                                    view=self.parent,
+                                )
                         else:
                             if self.parent.message:
-                                await self.parent.message.edit(content="Host has left and not enough players remain. Lobby aborted.", view=None)
+                                await self.parent.message.edit(
+                                    content="Host has left and not enough players remain. Lobby aborted.",
+                                    view=None,
+                                )
                             self.parent.players.clear()
                             self.parent.host = None
 
                     # Remove restart button if all players or just the host have left
-                    if (not self.parent.players) or (self.parent.host not in self.parent.players):
-                        if hasattr(self.parent, 'restart_message') and self.parent.restart_message:
+                    if (not self.parent.players) or (
+                        self.parent.host not in self.parent.players
+                    ):
+                        if (
+                            hasattr(self.parent, "restart_message")
+                            and self.parent.restart_message
+                        ):
                             try:
-                                await self.parent.restart_message.edit(content="Host has left the game. Restarting is no longer available.", view=None)
+                                await self.parent.restart_message.edit(
+                                    content="Host has left the game. Restarting is no longer available.",
+                                    view=None,
+                                )
                             except Exception:
                                 pass
                         self.parent.restart_message = None
@@ -117,13 +132,15 @@ def init(bot):
                 self.add_item(self.join_button)
                 self.add_item(self.start_button)
                 self.message = None
-            
+
             async def abort_callback(self, interaction: Interaction):
                 if interaction.user != self.host:
-                    await interaction.response.send_message("Only the host can abort the lobby.", ephemeral=True)
+                    await interaction.response.send_message(
+                        "Only the host can abort the lobby.", ephemeral=True
+                    )
                     return
                 if self.message:
-                    await self.message.edit(content="Lobby aborted.", view=None) # type: ignore
+                    await self.message.edit(content="Lobby aborted.", view=None)  # type: ignore
                 await asyncio.sleep(1)  # Give the message time to update
                 self.players.clear()
                 self.host = None
@@ -162,7 +179,14 @@ def init(bot):
                 await self.message.edit(view=None)  # type: ignore
 
             async def gameStart(self, interaction):
-                playerClasses = [players.Player(player) for player in self.players]
+                playerClasses = [
+                    (
+                        players.Player(player)
+                        if not isinstance(player, players.Player)
+                        else player
+                    )
+                    for player in self.players
+                ]
                 self.players = playerClasses
                 player_names = ", ".join(p.name for p in self.players)
                 gameStartedMessage = f"Game started! {player_names}, check your DMs."
@@ -233,9 +257,12 @@ def init(bot):
                                 "Only the host can restart the game.", ephemeral=True
                             )
                             return
-                        elif not any(interaction.user == p.player for p in self.parent.players):
+                        elif not any(
+                            interaction.user == p.player for p in self.parent.players
+                        ):
                             await interaction.response.send_message(
-                                "You, the host, are not in the game. Cannot restart. Aborting game.", ephemeral=True
+                                "You, the host, are not in the game. Cannot restart. Aborting game.",
+                                ephemeral=True,
                             )
                             await self.message.edit(content=f"{self.parent.host} has somehow left the game without losing host status. Game aborted.", view=None)  # type: ignore
                             await asyncio.sleep(1)  # Give the message time to update
