@@ -237,8 +237,10 @@ ALL_CARDS.append(
 
 
 class Deck:
-    def __init__(self):
+    def __init__(self, cardCount: int = 0):
         self.cards = []
+        if cardCount > 0:
+            self.draw(cardCount)
 
     def add_card(self, card: Card):
         self.cards.append(card)
