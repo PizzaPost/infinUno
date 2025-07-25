@@ -89,7 +89,7 @@ def init(bot):
                                 await self.parent.message.edit(content="Host has left and not enough players remain. Lobby aborted.", view=None)
                             self.parent.players.clear()
                             self.parent.host = None
-                    
+
                     # Remove restart button if all players or just the host have left
                     if (not self.parent.players) or (self.parent.host not in self.parent.players):
                         if hasattr(self.parent, 'restart_message') and self.parent.restart_message:
@@ -122,7 +122,6 @@ def init(bot):
                 if interaction.user != self.host:
                     await interaction.response.send_message("Only the host can abort the lobby.", ephemeral=True)
                     return
-                await interaction.response.send_message("Lobby aborted.", ephemeral=False)
                 if self.message:
                     await self.message.edit(content="Lobby aborted.", view=None) # type: ignore
                 self.players.clear()
