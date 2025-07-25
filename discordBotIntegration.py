@@ -233,7 +233,7 @@ def init(bot):
                                 "Only the host can restart the game.", ephemeral=True
                             )
                             return
-                        elif interaction.user not in self.parent.players:
+                        elif not any(interaction.user == p.player for p in self.parent.players):
                             await interaction.response.send_message(
                                 "You, the host, are not in the game. Cannot restart. Aborting game.", ephemeral=True
                             )
