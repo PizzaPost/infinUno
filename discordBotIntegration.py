@@ -40,6 +40,30 @@ def init(bot):
         """Starts the InfinUno game."""
 
         class JoinView(ui.View):
+            class LeaveView(ui.View):
+                def __init__(self, parent, player):
+                    super().__init__(timeout=None)
+                    self.parent = parent
+                    self.player = player
+                    self.leave_button = ui.Button(label="Leave", style=ButtonStyle.danger)
+                    self.leave_button.callback = self.leave_callback
+                    self.add_item(self.leave_button)
+                    self.message = None
+
+                async def leave_callback(self, interaction: Interaction):
+                    if hasattr(self.player, 'player') and interaction.user != self.player.player:
+                        await interaction.response.send_message("You can only leave your own game.", ephemeral=True)
+                        return
+                    # Remove player from game
+                    self.parent.players = [p for p in self.parent.players if p != self.player]
+                    await interaction.response.send_message("You have left the game.", ephemeral=True)
+                    if self.message:
+                        result = self.message.edit(content="You have left the game.", attachments=[], view=None)
+                        if asyncio.iscoroutine(result):
+                            try:
+                                await result # type: ignore
+                            except Exception:
+                                pass
             def __init__(self, host):
                 super().__init__(timeout=None)
                 self.players = []
@@ -118,21 +142,53 @@ def init(bot):
                 self.drawCounter += self.last_played_card.add  # add first, then multiply for more adding influence when also multiplying
                 self.drawCounter *= self.last_played_card.mult
                 
-                # Send initial deck image to all players
+                # Send initial deck image to all players with leave button
                 for player in self.players:
                     img_bytes = renderGameStateBytes(
                         self.window, self.last_played_card, player
                     )
+                    leave_view = self.LeaveView(self, player)
                     player.deck_message = await player.player.send(  # type: ignore
-                        file=discord.File(img_bytes, filename="your_deck.png")
+                        file=discord.File(img_bytes, filename="your_deck.png"),
+                        view=leave_view
                     )
+                    leave_view.message = player.deck_message # type: ignore
 
                 gameFinished = False
                 while not gameFinished:
                     gameFinished = await self.gameTick()
 
                 print(f"{player_names}: Game of infinUno finished.")
+                await self.show_restart_button(interaction)
                 pygame.quit()
+
+            async def show_restart_button(self, interaction):
+                class RestartView(ui.View):
+                    def __init__(self, parent):
+                        super().__init__(timeout=None)
+                        self.parent = parent
+                        self.restart_button = ui.Button(label="Restart Game", style=ButtonStyle.success)
+                        self.restart_button.callback = self.restart_callback
+                        self.add_item(self.restart_button)
+                        self.message = None
+
+                    async def restart_callback(self, interaction: Interaction):
+                        if interaction.user != self.parent.host:
+                            await interaction.response.send_message("Only the host can restart the game.", ephemeral=True)
+                            return
+                        await interaction.response.defer()
+                        # Restart the game with the same players
+                        self.parent.players = [p.player if hasattr(p, 'player') else p for p in self.parent.players]
+                        await self.parent.gameStart(interaction)
+                        self.stop()
+                        if self.message:
+                            result = self.message.edit(view=None)
+                            if asyncio.iscoroutine(result):
+                                await result # type: ignore
+
+                view = RestartView(self)
+                msg = await interaction.channel.send(f"Game finished! Host can restart the game.", view=view)
+                view.message = msg
 
             async def gameTick(self):
                 gameFinished = False
@@ -183,20 +239,28 @@ def init(bot):
                     img_bytes = renderGameStateBytes(
                         self.window, self.last_played_card, current_player
                     )
-                    await current_player.player.send( # type: ignore
-                        file=discord.File(img_bytes, filename="your_deck.png")
+                    leave_view = self.LeaveView(self, current_player)
+                    msg = await current_player.player.send( # type: ignore
+                        file=discord.File(img_bytes, filename="your_deck.png"),
+                        view=leave_view
                     )
+                    setattr(current_player, 'deck_message', msg)
+                    leave_view.message = msg
 
                 # Send updated deck image to all target players
                 for player in target_players:
                     img_bytes = renderGameStateBytes(
                         self.window, self.last_played_card, player
                     )
-                    # Instead of sending a new message, edit the previous one with the updated image
+                    leave_view = self.LeaveView(self, player)
+                    # Instead of sending a new message, edit the previous one with the updated image and leave button
                     if hasattr(player, "deck_message") and player.deck_message:
-                        await player.deck_message.edit(attachments=[discord.File(img_bytes, filename="your_deck.png")])
+                        await player.deck_message.edit(attachments=[discord.File(img_bytes, filename="your_deck.png")], view=leave_view)
+                        leave_view.message = player.deck_message
                     else:
-                        player.deck_message = await player.player.send(file=discord.File(img_bytes, filename="your_deck.png"))  # type: ignore
+                        msg = await player.player.send(file=discord.File(img_bytes, filename="your_deck.png"), view=leave_view)  # type: ignore
+                        setattr(player, 'deck_message', msg)
+                        leave_view.message = msg
                 
                 return gameFinished
 
