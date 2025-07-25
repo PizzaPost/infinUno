@@ -239,7 +239,7 @@ def init(bot):
                                 )
                         elif self.last_played_card.mult != 1.0:
                             self.drawCounter = int(
-                                current_player.hand.count * self.last_played_card.mult - current_player.hand.count
+                                current_player.hand.count() * self.last_played_card.mult - current_player.hand.count()
                             )
                     self.nextMessageContent += (
                         f"\nThere was an existing draw counter of {self.drawCounter}."
