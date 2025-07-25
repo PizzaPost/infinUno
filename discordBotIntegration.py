@@ -131,6 +131,7 @@ def init(bot):
                 while not gameFinished:
                     gameFinished = await self.gameTick()
 
+                print(f"{player_names}: Game of infinUno finished.")
                 pygame.quit()
 
             async def gameTick(self):
