@@ -289,6 +289,8 @@ def init(bot):
                 gameFinished = False
                 preventFurtherPlay = False
                 mayPlay = False
+                if not self.players:
+                    return True
                 current_player = self.players[self.current_player_index]
 
                 class CardSelect(ui.Select):
