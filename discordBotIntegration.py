@@ -320,9 +320,17 @@ def init(bot):
                 class CardView(ui.View):
                     def __init__(self, cards):
                         super().__init__(timeout=None)
-                        limitedCards = (
-                            cards if len(cards) <= 25 else random.choices(cards, k=25)
-                        )
+                        # Limit to 25 unique cards by name
+                        seen = set()
+                        unique_cards = []
+                        for c in cards:
+                            if c.name not in seen:
+                                seen.add(c.name)
+                                unique_cards.append(c)
+                        if len(unique_cards) > 25:
+                            limitedCards = random.sample(unique_cards, 25)
+                        else:
+                            limitedCards = unique_cards
                         self.select = CardSelect(limitedCards)
                         self.add_item(self.select)
 
