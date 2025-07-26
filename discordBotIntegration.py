@@ -330,9 +330,49 @@ def init(bot):
                             if c.add != 0 or c.mult != 1.0:
                                 stackable.append(c)
                         if stackable:
-                            # Let the player stack (this is a placeholder for actual interaction)
-                            # later, we'll prompt the player to play a stackable card
-                            # For now, just play the first stackable card
+                            # Ask the user to pick a stackable card from a dropdown
+                            class CardSelect(ui.Select):
+                                def __init__(self, cards):
+                                    options = [
+                                        discord.SelectOption(
+                                            label=c.name, description=str(c), value=str(i)
+                                        )
+                                        for i, c in enumerate(cards)
+                                    ]
+                                    super().__init__(
+                                        placeholder="Choose a stackable card to play",
+                                        min_values=1,
+                                        max_values=1,
+                                        options=options,
+                                    )
+                                    self.cards = cards
+                                    self.selected_card = None
+
+                                async def callback(self, interaction: Interaction):
+                                    idx = int(self.values[0])
+                                    self.selected_card = self.cards[idx]
+                                    self.view.stop() # type: ignore
+                                    await interaction.response.defer()
+
+                            class CardView(ui.View):
+                                def __init__(self, cards):
+                                    super().__init__(timeout=30)
+                                    self.select = CardSelect(cards)
+                                    self.add_item(self.select)
+
+                            stackable_view = CardView(stackable)
+                            
+                            prompt_msg = await target.deck_message.edit(
+                                content="You have stackable cards. Please pick one to play:",
+                                attachments=[discord.File(renderGameStateBytes(self.window, self.last_played_card, target), filename="your_deck.png")],
+                                view=stackable_view,
+                            )
+                            await stackable_view.wait()
+                            played_card = stackable_view.select.selected_card
+                            await prompt_msg.edit(content=f"You played: {played_card.name}", view=None) # type: ignore
+                            if played_card is None:
+                                # If user didn't pick, just pick the first one as fallback
+                                played_card = stackable[0]
                             preventFurtherPlay = True
                             played_card = stackable[0]
                             self.nextMessageContent += f"\n{current_player.name} automatically played their first stackable card: {played_card.name}."
