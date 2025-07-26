@@ -507,6 +507,9 @@ def init(bot):
                     self.drawCounter = int(
                         (self.drawCounter + played_card.add) * played_card.mult  # type: ignore
                     )
+                    # remove used up effects from the played card
+                    played_card.add = 0
+                    played_card.mult = 1.0
                 if played_card.reverse:
                     self.players.reverse()
                     self.current_player_index = self.players.index(current_player)
