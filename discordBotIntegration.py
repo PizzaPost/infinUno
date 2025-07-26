@@ -200,9 +200,7 @@ def init(bot):
                 )
                 self.last_played_card = cards.randomCard()
                 self.nextMessageContent = ""
-                self.current_player_index = (
-                    -1
-                )  # Since the last card was played by the game itself
+                self.current_player_index = -1
                 self.num_players = len(self.players)
                 self.drawCounter = 0
 
@@ -290,7 +288,7 @@ def init(bot):
                 mayPlay = False
                 if not self.players:
                     return True
-                current_player = self.players[self.current_player_index]
+                
 
                 class CardSelect(ui.Select):
                     def __init__(self, cards):
@@ -341,6 +339,8 @@ def init(bot):
                         self.current_player_index + offset
                     ) % self.num_players
                     target_players.append(self.players[target_index])
+                self.current_player_index = (self.current_player_index + 1) % self.num_players
+                current_player = self.players[self.current_player_index]
 
                 # Handle stacking draw cards
                 if (
@@ -490,10 +490,6 @@ def init(bot):
                         f"Congratulations {current_player.name}, you have won the game of InfinUno!"
                     )
 
-                # Update current player index for the next turn
-                self.current_player_index = (
-                    self.current_player_index + 1
-                ) % self.num_players
                 return gameFinished
 
             def playCard(self, played_card, current_player, target):
