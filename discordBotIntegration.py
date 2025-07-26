@@ -419,25 +419,15 @@ def init(bot):
                     )
                     leave_view = self.LeaveView(self, player)
                     content = f"{self.nextMessageContent}"
-                    if hasattr(player, "deck_message") and player.deck_message:
-                        # Edit the previous message with new image and content
-                        player.deck_message = await player.deck_message.edit(
-                            content=content,
-                            attachments=[
-                                discord.File(img_bytes, filename="your_deck.png")
-                            ],
-                            view=leave_view,
-                        )  # type: ignore
-                        leave_view.message = player.deck_message
-                    else:
-                        # Send a new message if none exists
-                        msg = await player.player.send(  # type: ignore
-                            content=f"This is your deck. {content}",
-                            file=discord.File(img_bytes, filename="your_deck.png"),
-                            view=leave_view,
-                        )
-                        player.deck_message = msg
-                        leave_view.message = msg
+                    # Edit the previous message with new image and content
+                    player.deck_message = await player.deck_message.edit( # type: ignore
+                        content=content,
+                        attachments=[
+                            discord.File(img_bytes, filename="your_deck.png")
+                        ],
+                        view=leave_view,
+                    )  # type: ignore
+                    leave_view.message = player.deck_message
 
                 # Update current player index for the next turn
                 self.current_player_index = (
