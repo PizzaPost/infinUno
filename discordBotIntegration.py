@@ -309,13 +309,13 @@ def init(bot):
                         )
                         self.cards = cards
                         self.selected_card = None
-    
+
                     async def callback(self, interaction: Interaction):
                         idx = int(self.values[0])
                         self.selected_card = self.cards[idx]
                         self.view.stop()  # type: ignore
                         await interaction.response.defer()
-    
+
                 class CardView(ui.View):
                     def __init__(self, cards):
                         super().__init__(timeout=30)
@@ -366,7 +366,7 @@ def init(bot):
                             stackable_view = CardView(stackable)
 
                             self.nextMessageContent += f"\n{target.name} has stackable cards and should pick one."
-                            prompt_msg = await target.deck_message.edit(
+                            target.deck_message = await target.deck_message.edit(
                                 content="You have stackable cards. Please pick one to play:",
                                 attachments=[
                                     discord.File(
@@ -380,7 +380,7 @@ def init(bot):
                             )
                             await stackable_view.wait()
                             played_card = stackable_view.select.selected_card
-                            await prompt_msg.edit(content=f"You played: {played_card.name}", view=None)  # type: ignore
+                            target.deck_message = await target.deck_message.edit(content=f"You played: {played_card.name}", view=None)  # type: ignore
                             if played_card is None:
                                 # If user didn't pick, just pick the first one as fallback
                                 played_card = stackable[0]
@@ -414,7 +414,7 @@ def init(bot):
                     )
                     playableCards = current_player.hand.cards
                     cardView = CardView(playableCards)  # type: ignore
-                    current_player.deck_message.edit(  # type: ignore
+                    current_player.deck_message = await current_player.deck_message.edit(  # type: ignore
                         content=f"{self.nextMessageContent}",
                         attachments=[
                             discord.File(
