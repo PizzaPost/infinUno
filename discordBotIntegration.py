@@ -212,10 +212,10 @@ def init(bot):
                     )  # Remove the game itself from affects of this first card
                 except ValueError:
                     pass
-                
+
                 for player in self.players:
-                    await player.player.send("I will send your deck here in a few seconds.") # type: ignore
-                
+                    await player.player.send("I will send your deck here in a few seconds.")  # type: ignore
+
                 await asyncio.sleep(5)
 
                 # Send initial deck image to all players with leave button
@@ -288,11 +288,12 @@ def init(bot):
                 self.nextMessageContent = ""
                 gameFinished = False
                 preventFurtherPlay = False
+                mayPlay = False
                 current_player = self.players[self.current_player_index]
 
                 # Gather all target players affected by the last played card
                 target_players = []
-                for offset in self.last_played_card.affects:
+                for offset in self.last_played_card.affects:  # type: ignore
                     target_index = (
                         self.current_player_index + offset
                     ) % self.num_players
@@ -301,24 +302,24 @@ def init(bot):
                 # Handle stacking draw cards
                 if (
                     self.drawCounter != 0
-                    or self.last_played_card.add != 0
-                    or self.last_played_card.mult != 1.0
+                    or self.last_played_card.add != 0  # type: ignore
+                    or self.last_played_card.mult != 1.0  # type: ignore
                 ):
                     if self.drawCounter == 0:
-                        if self.last_played_card.add != 0:
-                            self.drawCounter = self.last_played_card.add
-                            self.last_played_card.add = 0  # Remove the add from the card
-                            if self.last_played_card.mult != 1.0:
+                        if self.last_played_card.add != 0:  # type: ignore
+                            self.drawCounter = self.last_played_card.add  # type: ignore
+                            self.last_played_card.add = 0  # type: ignore # Remove the add from the card
+                            if self.last_played_card.mult != 1.0:  # type: ignore
                                 self.drawCounter = int(
-                                    self.drawCounter * self.last_played_card.mult
+                                    self.drawCounter * self.last_played_card.mult  # type: ignore
                                 )
-                                self.last_played_card.mult = 1.0  # Reset multiplier after applying
-                        elif self.last_played_card.mult != 1.0:
+                                self.last_played_card.mult = 1.0  # type: ignore # Reset multiplier after applying
+                        elif self.last_played_card.mult != 1.0:  # type: ignore
                             self.drawCounter = int(
-                                current_player.hand.count() * self.last_played_card.mult
+                                current_player.hand.count() * self.last_played_card.mult  # type: ignore
                                 - current_player.hand.count()
                             )
-                            self.last_played_card.mult = 1.0  # Reset multiplier after applying
+                            self.last_played_card.mult = 1.0  # type: ignore # Reset multiplier after applying
                     self.nextMessageContent += (
                         f"\nThere was an existing draw counter of {self.drawCounter}."
                     )
@@ -335,7 +336,9 @@ def init(bot):
                                 def __init__(self, cards):
                                     options = [
                                         discord.SelectOption(
-                                            label=c.name, description=str(c), value=str(i)
+                                            label=c.name,
+                                            description=str(c),
+                                            value=str(i),
                                         )
                                         for i, c in enumerate(cards)
                                     ]
@@ -351,7 +354,7 @@ def init(bot):
                                 async def callback(self, interaction: Interaction):
                                     idx = int(self.values[0])
                                     self.selected_card = self.cards[idx]
-                                    self.view.stop() # type: ignore
+                                    self.view.stop()  # type: ignore
                                     await interaction.response.defer()
 
                             class CardView(ui.View):
@@ -361,31 +364,29 @@ def init(bot):
                                     self.add_item(self.select)
 
                             stackable_view = CardView(stackable)
-                            
+
+                            self.nextMessageContent += f"\n{target.name} has stackable cards and should pick one."
                             prompt_msg = await target.deck_message.edit(
                                 content="You have stackable cards. Please pick one to play:",
-                                attachments=[discord.File(renderGameStateBytes(self.window, self.last_played_card, target), filename="your_deck.png")],
+                                attachments=[
+                                    discord.File(
+                                        renderGameStateBytes(
+                                            self.window, self.last_played_card, target
+                                        ),
+                                        filename="your_deck.png",
+                                    )
+                                ],
                                 view=stackable_view,
                             )
                             await stackable_view.wait()
                             played_card = stackable_view.select.selected_card
-                            await prompt_msg.edit(content=f"You played: {played_card.name}", view=None) # type: ignore
+                            await prompt_msg.edit(content=f"You played: {played_card.name}", view=None)  # type: ignore
                             if played_card is None:
                                 # If user didn't pick, just pick the first one as fallback
                                 played_card = stackable[0]
                             preventFurtherPlay = True
-                            played_card = stackable[0]
-                            self.nextMessageContent += f"\n{current_player.name} automatically played their first stackable card: {played_card.name}."
-                            target.hand.remove(played_card)
-                            self.last_played_card = played_card
-                            # Update drawCounter
-                            self.drawCounter = int(
-                                (self.drawCounter + played_card.add)
-                                * played_card.mult  # add first, then multiply for more adding influence when also multiplying
-                            )
-                            self.nextMessageContent += (
-                                f"\nThe draw counter is now {self.drawCounter}."
-                            )
+                            self.nextMessageContent += f"\n{current_player.name} played their stackable card: {played_card.name}."
+                            self.playCard(played_card, current_player, target)
                             stackableFound = True
                             break
                     if not stackableFound:
@@ -397,20 +398,37 @@ def init(bot):
                 # Check skip indicator
                 if preventFurtherPlay:
                     pass  # we have already played a card, so we cannot play another one
-                elif self.last_played_card.skip and current_player in target_players:
+                elif self.last_played_card.skip and current_player in target_players:  # type: ignore
                     self.nextMessageContent += (
                         f"\n{current_player.name} could not do anything further."
                     )
                     # we just got skipped. Because this card will also be the last played card for the next player, we must adjust the affects of this card by pushing every value down by one
-                    self.last_played_card.affects = [
-                        a - 1 for a in self.last_played_card.affects if a - 1 >= 0
+                    self.last_played_card.affects = [  # type: ignore
+                        a - 1 for a in self.last_played_card.affects if a - 1 >= 0  # type: ignore
                     ]
                     # we remove negative values, because with more players, the probability of this card laying long enough to skip someone from the end of the list decreases enough for us to just not respect you playing it.
                     # DO NOT remove removing negative values, as that will cause the game to get stuck in an infinite loop when there are not more players than affected targets.
                 else:
-                    # enable the current player to play a card
-                    self.nextMessageContent += f"\n{current_player.name} may now play a card. (But for now, the game ends here.)"
-                    gameFinished = True  # For now, we end the game as soon as a card can be played by the player
+                    self.nextMessageContent += (
+                        f"\n{current_player.name} may now play a card."
+                    )
+                    playableCards = current_player.hand.cards
+                    cardView = CardView(playableCards)  # type: ignore
+                    current_player.deck_message.edit(  # type: ignore
+                        content=f"{self.nextMessageContent}",
+                        attachments=[
+                            discord.File(
+                                renderGameStateBytes(
+                                    self.window, self.last_played_card, current_player
+                                ),
+                                filename="your_deck.png",
+                            )
+                        ],
+                        view=cardView,  # type: ignore
+                    )
+                    await cardView.wait()
+                    self.playCard(cardView.select.selected_card, current_player, current_player)
+                    self.nextMessageContent += f"\n{current_player.name} played: {cardView.select.selected_card.name}." # type: ignore
 
                 # Send all players an updated view of their deck together with the messageContent
                 for player in self.players:
@@ -420,11 +438,9 @@ def init(bot):
                     leave_view = self.LeaveView(self, player)
                     content = f"{self.nextMessageContent}"
                     # Edit the previous message with new image and content
-                    player.deck_message = await player.deck_message.edit( # type: ignore
+                    player.deck_message = await player.deck_message.edit(  # type: ignore
                         content=content,
-                        attachments=[
-                            discord.File(img_bytes, filename="your_deck.png")
-                        ],
+                        attachments=[discord.File(img_bytes, filename="your_deck.png")],
                         view=leave_view,
                     )  # type: ignore
                     leave_view.message = player.deck_message
@@ -434,6 +450,23 @@ def init(bot):
                     self.current_player_index + 1
                 ) % self.num_players
                 return gameFinished
+
+            def playCard(self, played_card, current_player, target):
+                """
+                Called when a player plays a card.
+
+                Removes the played card from the target player's hand and sets it as the last played card.
+                If the played card has the reverse attribute set to True, reverses the order of play and adjusts the current player index accordingly.
+
+                :param played_card: The card played by the current player.
+                :param current_player: The current player.
+                :param target: The target player.
+                """
+                target.hand.remove(played_card)
+                self.last_played_card = played_card
+                if played_card.reverse:
+                    self.players.reverse()
+                    self.current_player_index = self.players.index(current_player)
 
         view = JoinView(ctx.user)
         await ctx.response.send_message(
