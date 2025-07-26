@@ -19,7 +19,7 @@ class Window:
         self.name = name
         self.icon = cards.loadResource("resources/icon.png")
         self.window = pygame.display.set_mode(
-            (pygame.display.Info().current_w, pygame.display.Info().current_h),
+            (self.width, self.height),
             pygame.SCALED,
         ) if window is None else window
         pygame.display.set_caption(self.name)
