@@ -27,6 +27,7 @@ class Card:
         reverse: bool = False,
         color: str = "",
         nextColor: list[str] = [],
+        corner: str = "",
         image: list[str] = getImageList(
             ["resources/cards/unoBG.png", "resources/cards/unoFG.png"]
         ),
@@ -39,6 +40,7 @@ class Card:
         self.reverse = reverse
         self.color = color
         self.nextColor = nextColor if nextColor != [] else [color]
+        self.corner = corner
 
         img = loadResource(image[0]).convert_alpha()
         for img_path in image[1:]:
@@ -84,6 +86,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
             Card(
                 name=color + str(i),
                 color=color,
+                corner=str(i),
                 image=getImageList(
                     [
                         f"resources/cards/base/{color}.png",

@@ -417,12 +417,14 @@ def init(bot):
                         for c in current_player.hand.cards
                         if c.color in self.last_played_card.nextColor
                         or "choice" in self.last_played_card.nextColor
+                        or (c.corner == self.last_played_card.corner and c.corner != "")
+                        or c.color == "choice"
                     ]
                     
                     if not playableCards:
                         i = 0
                         cardPick = cards.Card("emptyCard")
-                        while cardPick.color not in self.last_played_card.nextColor:
+                        while cardPick.color not in self.last_played_card.nextColor and cardPick.color != "choice" and (cardPick.corner != self.last_played_card.corner and cardPick.corner != ""): # type: ignore
                             # Pick a random card until we find one that matches the last played card's nextColor
                             await asyncio.sleep(0.5)
                             cardPick = cards.randomCard()
