@@ -26,7 +26,7 @@ class Card:
         skip: bool = False,
         reverse: bool = False,
         color: str = "",
-        nextColor: str = "",
+        nextColor: list[str] = [],
         image: list[str] = getImageList(
             ["resources/cards/unoBG.png", "resources/cards/unoFG.png"]
         ),
@@ -38,7 +38,7 @@ class Card:
         self.skip = skip
         self.reverse = reverse
         self.color = color
-        self.nextColor = nextColor if nextColor is not None else color
+        self.nextColor = nextColor if nextColor is not None else [color]
 
         img = loadResource(image[0]).convert_alpha()
         for img_path in image[1:]:
