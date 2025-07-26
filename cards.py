@@ -305,7 +305,11 @@ class Deck:
 
 
 def randomCard():
-    return random.choice(ALL_CARDS).__deepcopy__()
+    card = random.choice(ALL_CARDS)
+    return copyCard(card)
+
+def copyCard(card):
+    return card.__deepcopy__()
 
 
 if __name__ == "__main__":
