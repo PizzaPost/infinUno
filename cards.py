@@ -411,6 +411,6 @@ def randomCard():
 def copyCard(card):
     return card.__deepcopy__()
 
-
+pygame.quit()
 if __name__ == "__main__":
     print(ALL_CARDS)
