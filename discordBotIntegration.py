@@ -418,6 +418,13 @@ def init(bot):
                         if c.color in self.last_played_card.nextColor
                         or "choice" in self.last_played_card.nextColor
                     ]
+                    
+                    if not playableCards:
+                        while (cardPick := cards.randomCard()).color not in self.last_played_card.nextColor:
+                            # Pick a random card until we find one that matches the last played card's nextColor
+                            pass
+                        playableCards = [cardPick]
+                    
                     cardView = CardView(playableCards)  # type: ignore
                     current_player.deck_message = await current_player.deck_message.edit(  # type: ignore
                         content=f"{self.nextMessageContent}",
