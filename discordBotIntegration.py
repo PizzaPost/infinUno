@@ -318,7 +318,7 @@ def init(bot):
 
                 class CardView(ui.View):
                     def __init__(self, cards):
-                        super().__init__(timeout=30)
+                        super().__init__(timeout=None)
                         self.select = CardSelect(cards)
                         self.add_item(self.select)
 
@@ -367,7 +367,7 @@ def init(bot):
 
                             self.nextMessageContent += f"\n{target.name} has stackable cards and should pick one."
                             target.deck_message = await target.deck_message.edit(
-                                content="You have stackable cards. Please pick one to play:",
+                                content=f"{self.nextMessageContent}",
                                 attachments=[
                                     discord.File(
                                         renderGameStateBytes(
