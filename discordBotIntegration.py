@@ -232,10 +232,10 @@ def init(bot):
 
                 gameFinished = False
                 while not gameFinished and self.players:
-                    await asyncio.sleep(
-                        2
-                    )  # give the players some time to read the last message, in case something happens fast
+                    await asyncio.sleep(1)
+                    # give the players some time to read the last message, in case something happens fast
                     gameFinished = await self.gameTick()
+                    await asyncio.sleep(1)
 
                 print(f"{player_names}: Game of infinUno finished.")
                 await self.show_restart_button(interaction)
