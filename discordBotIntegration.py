@@ -290,6 +290,37 @@ def init(bot):
                 preventFurtherPlay = False
                 mayPlay = False
                 current_player = self.players[self.current_player_index]
+                
+                class CardSelect(ui.Select):
+                    def __init__(self, cards):
+                        options = [
+                            discord.SelectOption(
+                                label=c.name,
+                                description=str(c),
+                                value=str(i),
+                            )
+                            for i, c in enumerate(cards)
+                        ]
+                        super().__init__(
+                            placeholder="Choose a stackable card to play",
+                            min_values=1,
+                            max_values=1,
+                            options=options,
+                        )
+                        self.cards = cards
+                        self.selected_card = None
+    
+                    async def callback(self, interaction: Interaction):
+                        idx = int(self.values[0])
+                        self.selected_card = self.cards[idx]
+                        self.view.stop()  # type: ignore
+                        await interaction.response.defer()
+    
+                class CardView(ui.View):
+                    def __init__(self, cards):
+                        super().__init__(timeout=30)
+                        self.select = CardSelect(cards)
+                        self.add_item(self.select)
 
                 # Gather all target players affected by the last played card
                 target_players = []
@@ -332,37 +363,6 @@ def init(bot):
                                 stackable.append(c)
                         if stackable:
                             # Ask the user to pick a stackable card from a dropdown
-                            class CardSelect(ui.Select):
-                                def __init__(self, cards):
-                                    options = [
-                                        discord.SelectOption(
-                                            label=c.name,
-                                            description=str(c),
-                                            value=str(i),
-                                        )
-                                        for i, c in enumerate(cards)
-                                    ]
-                                    super().__init__(
-                                        placeholder="Choose a stackable card to play",
-                                        min_values=1,
-                                        max_values=1,
-                                        options=options,
-                                    )
-                                    self.cards = cards
-                                    self.selected_card = None
-
-                                async def callback(self, interaction: Interaction):
-                                    idx = int(self.values[0])
-                                    self.selected_card = self.cards[idx]
-                                    self.view.stop()  # type: ignore
-                                    await interaction.response.defer()
-
-                            class CardView(ui.View):
-                                def __init__(self, cards):
-                                    super().__init__(timeout=30)
-                                    self.select = CardSelect(cards)
-                                    self.add_item(self.select)
-
                             stackable_view = CardView(stackable)
 
                             self.nextMessageContent += f"\n{target.name} has stackable cards and should pick one."
