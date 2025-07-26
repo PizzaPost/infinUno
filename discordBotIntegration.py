@@ -321,7 +321,8 @@ def init(bot):
                 class CardView(ui.View):
                     def __init__(self, cards):
                         super().__init__(timeout=None)
-                        self.select = CardSelect(cards)
+                        limitedCards = cards if len(cards) <= 25 else random.choices(cards, k=25)
+                        self.select = CardSelect(limitedCards)
                         self.add_item(self.select)
 
                 # Gather all target players affected by the last played card
