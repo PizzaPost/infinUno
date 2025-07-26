@@ -444,6 +444,13 @@ def init(bot):
                         view=leave_view,
                     )  # type: ignore
                     leave_view.message = player.deck_message
+                
+                if current_player.hand.count() == 0:
+                    gameFinished = True
+                    self.nextMessageContent += f"\n{current_player.name} has won the game!"
+                    await current_player.player.send( # type: ignore
+                        f"Congratulations {current_player.name}, you have won the game of InfinUno!"
+                    )
 
                 # Update current player index for the next turn
                 self.current_player_index = (
