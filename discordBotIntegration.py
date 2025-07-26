@@ -185,6 +185,9 @@ def init(bot):
                     for player in self.players
                 ]
                 self.players = playerClasses
+                for player in self.players:
+                    player.hand.clear()
+                    player.hand.draw(7)
                 player_names = ", ".join(p.name for p in self.players)
                 gameStartedMessage = f"Game started! {player_names}, check your DMs."
                 try:
