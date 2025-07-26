@@ -423,8 +423,14 @@ def init(bot):
                         i = 0
                         while (cardPick := cards.randomCard()).color not in self.last_played_card.nextColor:
                             # Pick a random card until we find one that matches the last played card's nextColor
+                            await asyncio.sleep(0.5)
+                            current_player.deck_message = await current_player.deck_message.edit(  # type: ignore
+                                content=f"You pulled {cardPick.name} ({cardPick.color}), because you had no {self.last_played_card.nextColor} cards."
+                            )
                             i += 1
-                            pass
+                            if current_player not in self.players:
+                                # If the player has left the game, stop this gameTick.
+                                return False
                         self.nextMessageContent += f"\n{current_player.name} had no playable cards and drew {i} cards from the deck, until {cardPick.name} could be played."  # type: ignore
                         playableCards = [cardPick]
                     
