@@ -95,10 +95,15 @@ def renderGameState(window, last_played_card, player, players):
         ),
     )
     pygame.font.init()
-    font = pygame.font.SysFont(None, 48)
+    font = pygame.font.SysFont(None, 30)
+    WHITE = (255, 255, 255)
+    RED = (255, 0, 0)
+    leastCards = min(players, key=lambda p: p.hand.count())
+    mostCards = max(players, key=lambda p: p.hand.count())
     for idx, p in enumerate(players):
-        text_surface = font.render(f"{p.name}: {len(p.hand.cards)} cards", True, (255, 255, 255))
-        deck_image.blit(text_surface, (10, 10 + idx * 50))
+        cardCount = p.hand.count()
+        text_surface = font.render(f"{p.name}: {cardCount} cards", True, WHITE if cardCount < 50 else RED)
+        deck_image.blit(text_surface, (10, 10 + idx * 35))
 
     return deck_image
 

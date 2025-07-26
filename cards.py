@@ -104,7 +104,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                         f"resources/cards/corners/{i}.png",
                     ]
                 ),
-                weight=2.0,
+                weight=1.0,
             )
         )
 
@@ -187,7 +187,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     "resources/cards/corners/min1.png",
                 ]
             ),
-            weight=1.2,
+            weight=1.0,
         )
     )
 
@@ -219,7 +219,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/plu4.png",
             ]
         ),
-        weight=0.6,
+        weight=1.0,
     )
 )
 
@@ -236,7 +236,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/mul4.png",
             ]
         ),
-        weight=0.5,
+        weight=1.0,
     )
 )
 
@@ -253,7 +253,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/mul2.png",
             ]
         ),
-        weight=0.7,
+        weight=1.0,
     )
 )
 
@@ -270,7 +270,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/div2.png",
             ]
         ),
-        weight=0.7,
+        weight=1.0,
     )
 )
 
@@ -287,7 +287,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/plu10.png",
             ]
         ),
-        weight=0.7,
+        weight=1.0,
     )
 )
 
@@ -296,6 +296,7 @@ ALL_CARDS.append(
         name="-10",
         color="choice",
         add=-10,
+        affects=[0],
         skip=True,
         image=getImageList(
             [
@@ -304,7 +305,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/min10.png",
             ]
         ),
-        weight=0.3,
+        weight=1.0,
     )
 )
 
@@ -321,7 +322,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/div3.png",
             ]
         ),
-        weight=0.6,
+        weight=1.0,
     )
 )
 
@@ -338,7 +339,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/div4.png",
             ]
         ),
-        weight=0.6,
+        weight=1.0,
     )
 )
 
@@ -355,7 +356,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/pow2.png",
             ]
         ),
-        weight=0.1,
+        weight=1.0,
     )
 )
 
@@ -364,6 +365,7 @@ ALL_CARDS.append(
         name="-4",
         color="choice",
         add=-4,
+        affects=[0],
         skip=True,
         image=getImageList(
             [
@@ -372,7 +374,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/min4.png",
             ]
         ),
-        weight=0.5,
+        weight=1.0,
     )
 )
 
