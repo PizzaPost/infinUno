@@ -22,7 +22,9 @@ class Card:
         name: str = "",
         add: int = 0,
         mult: float = 1.0,
+        pow: float = 1.0,
         affects: list = [1],
+        affectInvert: bool = False,
         skip: bool = False,
         reverse: bool = False,
         color: str = "",
@@ -35,7 +37,9 @@ class Card:
         self.name = name
         self.add = add
         self.mult = mult
+        self.pow = pow
         self.affects = affects
+        self.affectInvert = affectInvert
         self.skip = skip
         self.reverse = reverse
         self.color = color
@@ -252,6 +256,102 @@ ALL_CARDS.append(
                 "resources/cards/base/multicolored.png",
                 "resources/cards/mini_card/uncolored.png",
                 "resources/cards/corners/div2.png",
+            ]
+        ),
+    )
+)
+
+ALL_CARDS.append(
+    Card(
+        name="plus10",
+        color="choice",
+        add=10,
+        skip=True,
+        image=getImageList(
+            [
+                "resources/cards/base/multicolored.png",
+                "resources/cards/mini_card/uncolored.png",
+                "resources/cards/corners/plu10.png",
+            ]
+        )
+    )
+)
+
+ALL_CARDS.append(
+    Card(
+        name="-10",
+        color="choice",
+        add=-10,
+        skip=True,
+        image=getImageList(
+            [
+                "resources/cards/base/multicolored.png",
+                "resources/cards/mini_card/uncolored.png",
+                "resources/cards/corners/min10.png",
+            ]
+        ),
+    )
+)
+
+ALL_CARDS.append(
+    Card(
+        name="/3",
+        color="choice",
+        mult=1 / 3,
+        skip=True,
+        image=getImageList(
+            [
+                "resources/cards/base/multicolored.png",
+                "resources/cards/mini_card/uncolored.png",
+                "resources/cards/corners/div3.png",
+            ]
+        ),
+    )
+)
+
+ALL_CARDS.append(
+    Card(
+        name="/4",
+        color="choice",
+        mult=1 / 4,
+        skip=True,
+        image=getImageList(
+            [
+                "resources/cards/base/multicolored.png",
+                "resources/cards/mini_card/uncolored.png",
+                "resources/cards/corners/div4.png",
+            ]
+        ),
+    )
+)
+
+ALL_CARDS.append(
+    Card(
+        name="^2",
+        color="choice",
+        pow=2,
+        skip=True,
+        image=getImageList(
+            [
+                "resources/cards/base/multicolored.png",
+                "resources/cards/mini_card/uncolored.png",
+                "resources/cards/corners/pow2.png",
+            ]
+        ),
+    )
+)
+
+ALL_CARDS.append(
+    Card(
+        name="-4",
+        color="choice",
+        add=-4,
+        skip=True,
+        image=getImageList(
+            [
+                "resources/cards/base/multicolored.png",
+                "resources/cards/mini_card/uncolored.png",
+                "resources/cards/corners/min4.png",
             ]
         ),
     )
