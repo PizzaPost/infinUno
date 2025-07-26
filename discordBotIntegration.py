@@ -239,7 +239,6 @@ def init(bot):
 
                 print(f"{player_names}: Game of infinUno finished.")
                 await self.show_restart_button(interaction)
-                pygame.quit()
 
             async def show_restart_button(self, interaction):
                 class RestartView(ui.View):

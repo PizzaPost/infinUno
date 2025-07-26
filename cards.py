@@ -308,6 +308,5 @@ def randomCard():
     return random.choice(ALL_CARDS).__deepcopy__()
 
 
-pygame.quit()
 if __name__ == "__main__":
     print(ALL_CARDS)
