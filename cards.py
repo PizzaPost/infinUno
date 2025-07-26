@@ -75,7 +75,11 @@ def loadResource(img_path):
     base_dir = os.path.dirname(os.path.abspath(__file__))
     if not os.path.isabs(img_path):
         img_path = os.path.join(base_dir, img_path)
-    return pygame.image.load(img_path)
+    try:
+        pyImage = pygame.image.load(img_path)
+    except Exception as e:
+        pyImage = pygame.image.load(os.path.join(base_dir, "resources/icon.png"))
+    return pyImage
 
 
 ALL_CARDS = []
