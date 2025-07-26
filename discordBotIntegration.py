@@ -420,9 +420,12 @@ def init(bot):
                     ]
                     
                     if not playableCards:
+                        i = 0
                         while (cardPick := cards.randomCard()).color not in self.last_played_card.nextColor:
                             # Pick a random card until we find one that matches the last played card's nextColor
+                            i += 1
                             pass
+                        self.nextMessageContent += f"\n{current_player.name} had no playable cards and drew {i} cards from the deck, until {cardPick.name} could be played."  # type: ignore
                         playableCards = [cardPick]
                     
                     cardView = CardView(playableCards)  # type: ignore
