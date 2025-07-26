@@ -380,7 +380,8 @@ def init(bot):
                             )
                             await stackable_view.wait()
                             played_card = stackable_view.select.selected_card
-                            target.deck_message = await target.deck_message.edit(content=f"You played: {played_card.name}", view=None)  # type: ignore
+                            self.nextMessageContent += f"\n{target.name} picked: {played_card.name}." # type: ignore
+                            target.deck_message = await target.deck_message.edit(content=f"{self.nextMessageContent}", view=None)  # type: ignore
                             if played_card is None:
                                 # If user didn't pick, just pick the first one as fallback
                                 played_card = stackable[0]
