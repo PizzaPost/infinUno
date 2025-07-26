@@ -8,8 +8,8 @@ import io
 from PIL import Image
 
 
-def renderGameStateBytes(window, last_played_card, player):
-    deck_image = visuals.renderGameState(window, last_played_card, player)
+def renderGameStateBytes(window, last_played_card, player, Players):
+    deck_image = visuals.renderGameState(window, last_played_card, player, Players)
     # Convert pygame surface to string buffer
     data = pygame.image.tostring(deck_image, "RGBA")
     size = deck_image.get_size()
@@ -32,7 +32,7 @@ def init(bot):
         window = visuals.Window(
             "InfinUno Deck Preview", pygame.display.set_mode((800, 600), pygame.HIDDEN)
         )
-        img_bytes = renderGameStateBytes(window, last_played_card, players.Player())
+        img_bytes = renderGameStateBytes(window, last_played_card, players.Player(), [players.Player()])
         await ctx.send(file=discord.File(img_bytes, filename="your_deck.png"))
 
     @bot.tree.command(name="infinuno")
@@ -222,7 +222,7 @@ def init(bot):
                 # Send initial deck image to all players with leave button
                 for player in self.players:
                     img_bytes = renderGameStateBytes(
-                        self.window, self.last_played_card, player
+                        self.window, self.last_played_card, player, self.players
                     )
                     leave_view = self.LeaveView(self, player)
                     player.deck_message = await player.player.send(  # type: ignore
@@ -405,7 +405,7 @@ def init(bot):
                                 attachments=[
                                     discord.File(
                                         renderGameStateBytes(
-                                            self.window, self.last_played_card, target
+                                            self.window, self.last_played_card, target, self.players
                                         ),
                                         filename="your_deck.png",
                                     )
@@ -475,7 +475,7 @@ def init(bot):
                         attachments=[
                             discord.File(
                                 renderGameStateBytes(
-                                    self.window, self.last_played_card, current_player
+                                    self.window, self.last_played_card, current_player, self.players
                                 ),
                                 filename="your_deck.png",
                             )
@@ -491,7 +491,7 @@ def init(bot):
                 # Send all players an updated view of their deck together with the messageContent
                 for player in self.players:
                     img_bytes = renderGameStateBytes(
-                        self.window, self.last_played_card, player
+                        self.window, self.last_played_card, player, self.players
                     )
                     leave_view = self.LeaveView(self, player)
                     content = f"{self.nextMessageContent}"

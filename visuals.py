@@ -85,7 +85,7 @@ def deckImage(window, deck):
     return surface
 
 
-def renderGameState(window, last_played_card, player):
+def renderGameState(window, last_played_card, player, players):
     deck_image = deckImage(window, player.hand)
     deck_image.blit(
         last_played_card.image,
@@ -94,6 +94,11 @@ def renderGameState(window, last_played_card, player):
             10,
         ),
     )
+    pygame.font.init()
+    font = pygame.font.SysFont(None, 48)
+    for idx, p in enumerate(players):
+        text_surface = font.render(f"Player {idx+1}: {len(p.hand.cards)} cards", True, (255, 255, 255))
+        deck_image.blit(text_surface, (10, 10 + idx * 50))
 
     return deck_image
 
