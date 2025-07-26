@@ -38,7 +38,7 @@ class Card:
         self.skip = skip
         self.reverse = reverse
         self.color = color
-        self.nextColor = nextColor if nextColor is not None else [color]
+        self.nextColor = nextColor if nextColor != [] else [color]
 
         img = loadResource(image[0]).convert_alpha()
         for img_path in image[1:]:
