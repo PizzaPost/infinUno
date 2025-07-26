@@ -187,7 +187,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     "resources/cards/corners/min1.png",
                 ]
             ),
-            weight=0.8,
+            weight=1.2,
         )
     )
 
@@ -202,7 +202,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/questionmark.png",
             ]
         ),
-        weight=0.7,
+        weight=1.0,
     )
 )
 
@@ -219,7 +219,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/plu4.png",
             ]
         ),
-        weight=0.5,
+        weight=0.6,
     )
 )
 
@@ -287,7 +287,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/plu10.png",
             ]
         ),
-        weight=0.3,
+        weight=0.7,
     )
 )
 
@@ -355,7 +355,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/pow2.png",
             ]
         ),
-        weight=0.5,
+        weight=0.1,
     )
 )
 
