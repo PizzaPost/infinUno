@@ -350,8 +350,9 @@ def init(bot):
                 # Handle stacking draw cards
                 if (
                     self.drawCounter != 0
-                    or self.last_played_card.add != 0  # type: ignore
-                    or self.last_played_card.mult != 1.0  # type: ignore
+                    or self.last_played_card.add != 0
+                    or self.last_played_card.mult != 1.0
+                    or self.last_played_card.pow != 1.0
                 ):
                     if self.drawCounter == 0:
                         if self.last_played_card.add != 0:  # type: ignore
@@ -362,12 +363,28 @@ def init(bot):
                                     self.drawCounter * self.last_played_card.mult  # type: ignore
                                 )
                                 self.last_played_card.mult = 1.0  # type: ignore # Reset multiplier after applying
+                            if self.last_played_card.pow != 1.0:  # type: ignore
+                                self.drawCounter = int(
+                                    self.drawCounter ** self.last_played_card.pow  # type: ignore
+                                )
+                                self.last_played_card.pow = 1.0  # type: ignore # Reset power after applying
                         elif self.last_played_card.mult != 1.0:  # type: ignore
                             self.drawCounter = int(
                                 current_player.hand.count() * self.last_played_card.mult  # type: ignore
                                 - current_player.hand.count()
                             )
                             self.last_played_card.mult = 1.0  # type: ignore # Reset multiplier after applying
+                            if self.last_played_card.pow != 1.0:  # type: ignore
+                                self.drawCounter = int(
+                                    self.drawCounter ** self.last_played_card.pow  # type: ignore
+                                )
+                                self.last_played_card.pow = 1.0  # type: ignore # Reset power after applying
+                        elif self.last_played_card.pow != 1.0:  # type: ignore
+                            self.drawCounter = int(
+                                current_player.hand.count() ** self.last_played_card.pow  # type: ignore
+                                - current_player.hand.count()
+                            )
+                            self.last_played_card.pow = 1.0  # type: ignore # Reset power after applying
                     self.nextMessageContent += (
                         f"\nThere was an existing draw counter of {self.drawCounter}."
                     )
