@@ -416,7 +416,7 @@ def init(bot):
                         c
                         for c in current_player.hand.cards
                         if c.color in self.last_played_card.nextColor
-                        or any(f in self.last_played_card.nextColor for f in ["choice"])
+                        or "choice" in self.last_played_card.nextColor
                     ]
                     cardView = CardView(playableCards)  # type: ignore
                     current_player.deck_message = await current_player.deck_message.edit(  # type: ignore
