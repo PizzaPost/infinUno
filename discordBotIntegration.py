@@ -490,6 +490,10 @@ def init(bot):
                 """
                 target.hand.remove(played_card)
                 self.last_played_card = played_card
+                if self.drawCounter != 0:
+                    self.drawCounter = int(
+                        (self.drawCounter + played_card.add) * played_card.mult  # type: ignore
+                    )
                 if played_card.reverse:
                     self.players.reverse()
                     self.current_player_index = self.players.index(current_player)
