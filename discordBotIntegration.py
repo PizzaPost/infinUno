@@ -231,7 +231,7 @@ def init(bot):
                     leave_view.message = player.deck_message  # type: ignore
 
                 gameFinished = False
-                while not gameFinished:
+                while not gameFinished and self.players:
                     await asyncio.sleep(
                         2
                     )  # give the players some time to read the last message, in case something happens fast
