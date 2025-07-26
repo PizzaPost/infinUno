@@ -30,9 +30,10 @@ class Card:
         color: str = "",
         nextColor: list[str] = [],
         corner: str = "",
-        image: list[str] = getImageList(
-            ["resources/cards/unoBG.png", "resources/cards/unoFG.png"]
-        ),
+        image: list[str] = getImageList([
+            "resources/cards/unoBG.png", "resources/cards/unoFG.png"
+        ]),
+        weight: float = 1.0,
     ):
         self.name = name
         self.add = add
@@ -45,6 +46,7 @@ class Card:
         self.color = color
         self.nextColor = nextColor if nextColor != [] else [color]
         self.corner = corner
+        self.weight = weight
 
         img = loadResource(image[0]).convert_alpha()
         for img_path in image[1:]:
@@ -102,6 +104,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                         f"resources/cards/corners/{i}.png",
                     ]
                 ),
+                weight=2.0,
             )
         )
 
@@ -117,6 +120,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     f"resources/cards/corners/skip.png",
                 ]
             ),
+            weight=1.0,
         )
     )
 
@@ -132,6 +136,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     f"resources/cards/corners/reverse.png",
                 ]
             ),
+            weight=1.0,
         )
     )
 
@@ -148,6 +153,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     "resources/cards/corners/plu2.png",
                 ]
             ),
+            weight=1.0,
         )
     )
 
@@ -164,6 +170,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     "resources/cards/corners/plu1.png",
                 ]
             ),
+            weight=1.0,
         )
     )
 
@@ -180,6 +187,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     "resources/cards/corners/min1.png",
                 ]
             ),
+            weight=0.8,
         )
     )
 
@@ -194,6 +202,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/questionmark.png",
             ]
         ),
+        weight=0.7,
     )
 )
 
@@ -210,6 +219,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/plu4.png",
             ]
         ),
+        weight=0.5,
     )
 )
 
@@ -226,6 +236,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/mul4.png",
             ]
         ),
+        weight=0.5,
     )
 )
 
@@ -242,6 +253,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/mul2.png",
             ]
         ),
+        weight=0.7,
     )
 )
 
@@ -258,6 +270,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/div2.png",
             ]
         ),
+        weight=0.7,
     )
 )
 
@@ -273,7 +286,8 @@ ALL_CARDS.append(
                 "resources/cards/mini_card/uncolored.png",
                 "resources/cards/corners/plu10.png",
             ]
-        )
+        ),
+        weight=0.3,
     )
 )
 
@@ -290,6 +304,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/min10.png",
             ]
         ),
+        weight=0.3,
     )
 )
 
@@ -306,6 +321,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/div3.png",
             ]
         ),
+        weight=0.6,
     )
 )
 
@@ -322,6 +338,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/div4.png",
             ]
         ),
+        weight=0.6,
     )
 )
 
@@ -338,6 +355,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/pow2.png",
             ]
         ),
+        weight=0.5,
     )
 )
 
@@ -354,6 +372,7 @@ ALL_CARDS.append(
                 "resources/cards/corners/min4.png",
             ]
         ),
+        weight=0.5,
     )
 )
 
@@ -405,7 +424,8 @@ class Deck:
 
 
 def randomCard():
-    card = random.choice(ALL_CARDS)
+    weights = [card.weight for card in ALL_CARDS]
+    card = random.choices(ALL_CARDS, weights=weights, k=1)[0]
     return copyCard(card)
 
 def copyCard(card):
