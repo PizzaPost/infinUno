@@ -290,7 +290,7 @@ def init(bot):
                 preventFurtherPlay = False
                 mayPlay = False
                 current_player = self.players[self.current_player_index]
-                
+
                 class CardSelect(ui.Select):
                     def __init__(self, cards):
                         options = [
@@ -380,7 +380,7 @@ def init(bot):
                             )
                             await stackable_view.wait()
                             played_card = stackable_view.select.selected_card
-                            self.nextMessageContent += f"\n{target.name} picked: {played_card.name}." # type: ignore
+                            self.nextMessageContent += f"\n{target.name} picked: {played_card.name}."  # type: ignore
                             target.deck_message = await target.deck_message.edit(content=f"{self.nextMessageContent}", view=None)  # type: ignore
                             if played_card is None:
                                 # If user didn't pick, just pick the first one as fallback
@@ -412,7 +412,12 @@ def init(bot):
                     self.nextMessageContent += (
                         f"\n{current_player.name} may now play a card."
                     )
-                    playableCards = current_player.hand.cards
+                    playableCards = [
+                        c
+                        for c in current_player.hand.cards
+                        if c.color in self.last_played_card.nextColor
+                        or any(f in self.last_played_card.nextColor for f in ["choice"])
+                    ]
                     cardView = CardView(playableCards)  # type: ignore
                     current_player.deck_message = await current_player.deck_message.edit(  # type: ignore
                         content=f"{self.nextMessageContent}",
@@ -427,8 +432,10 @@ def init(bot):
                         view=cardView,  # type: ignore
                     )
                     await cardView.wait()
-                    self.playCard(cardView.select.selected_card, current_player, current_player)
-                    self.nextMessageContent += f"\n{current_player.name} played: {cardView.select.selected_card.name}." # type: ignore
+                    self.playCard(
+                        cardView.select.selected_card, current_player, current_player
+                    )
+                    self.nextMessageContent += f"\n{current_player.name} played: {cardView.select.selected_card.name}."  # type: ignore
 
                 # Send all players an updated view of their deck together with the messageContent
                 for player in self.players:
@@ -444,11 +451,13 @@ def init(bot):
                         view=leave_view,
                     )  # type: ignore
                     leave_view.message = player.deck_message
-                
+
                 if current_player.hand.count() == 0:
                     gameFinished = True
-                    self.nextMessageContent += f"\n{current_player.name} has won the game!"
-                    await current_player.player.send( # type: ignore
+                    self.nextMessageContent += (
+                        f"\n{current_player.name} has won the game!"
+                    )
+                    await current_player.player.send(  # type: ignore
                         f"Congratulations {current_player.name}, you have won the game of InfinUno!"
                     )
 
