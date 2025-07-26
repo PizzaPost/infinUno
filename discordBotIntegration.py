@@ -320,7 +320,9 @@ def init(bot):
                 class CardView(ui.View):
                     def __init__(self, cards):
                         super().__init__(timeout=None)
-                        limitedCards = cards if len(cards) <= 25 else random.choices(cards, k=25)
+                        limitedCards = (
+                            cards if len(cards) <= 25 else random.choices(cards, k=25)
+                        )
                         self.select = CardSelect(limitedCards)
                         self.add_item(self.select)
 
@@ -422,25 +424,21 @@ def init(bot):
                         or (c.corner == self.last_played_card.corner and c.corner != "")
                         or c.color == "choice"
                     ]
-                    
+
                     if not playableCards:
                         i = 0
                         cardPick = cards.Card("emptyCard")
-                        while cardPick.color not in self.last_played_card.nextColor and cardPick.color != "choice" and (cardPick.corner != self.last_played_card.corner or cardPick.corner == ""): # type: ignore
+                        while cardPick.color not in self.last_played_card.nextColor and cardPick.color != "choice" and (cardPick.corner != self.last_played_card.corner or cardPick.corner == ""):  # type: ignore
                             # Pick a random card until we find one that matches the last played card's nextColor
-                            await asyncio.sleep(0.5)
                             cardPick = cards.randomCard()
                             current_player.hand.add(cardPick)
-                            current_player.deck_message = await current_player.deck_message.edit(  # type: ignore
-                                content=f"You pulled {cardPick.name} ({cardPick.color}), because you had no {self.last_played_card.nextColor} cards."
-                            )
                             i += 1
                             if current_player not in self.players:
                                 # If the player has left the game, stop this gameTick.
                                 return False
-                        self.nextMessageContent += f"\n{current_player.name} had no playable cards and drew {i} cards from the deck, until {cardPick.name} could be played."  # type: ignore
+                        self.nextMessageContent += f"\n{current_player.name} had no playable cards and drew {i} cards from the deck."  # type: ignore
                         playableCards = [cardPick]
-                    
+
                     cardView = CardView(playableCards)  # type: ignore
                     current_player.deck_message = await current_player.deck_message.edit(  # type: ignore
                         content=f"{self.nextMessageContent}",
