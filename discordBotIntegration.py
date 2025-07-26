@@ -333,6 +333,7 @@ def init(bot):
                         self.add_item(self.select)
 
                 # Gather all target players affected by the last played card
+                self.num_players = len(self.players)
                 target_players = []
                 for offset in self.last_played_card.affects:  # type: ignore
                     target_index = (
