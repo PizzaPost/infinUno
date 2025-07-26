@@ -338,7 +338,8 @@ def init(bot):
                     target_index = (
                         self.current_player_index + offset
                     ) % self.num_players
-                    target_players.append(self.players[target_index])
+                    if target_index >= 0:
+                        target_players.append(self.players[target_index])
                 self.current_player_index = (self.current_player_index + 1) % self.num_players
                 current_player = self.players[self.current_player_index]
 
