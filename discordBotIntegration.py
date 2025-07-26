@@ -302,7 +302,7 @@ def init(bot):
                             for i, c in enumerate(cards)
                         ]
                         super().__init__(
-                            placeholder="Choose a stackable card to play",
+                            placeholder="Choose a card to play",
                             min_values=1,
                             max_values=1,
                             options=options,
@@ -386,7 +386,6 @@ def init(bot):
                                 # If user didn't pick, just pick the first one as fallback
                                 played_card = stackable[0]
                             preventFurtherPlay = True
-                            self.nextMessageContent += f"\n{current_player.name} played their stackable card: {played_card.name}."
                             self.playCard(played_card, current_player, target)
                             stackableFound = True
                             break
