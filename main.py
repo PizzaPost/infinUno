@@ -17,6 +17,9 @@ def show_deck(window, deck):
                        (window.width // 2 - deckImage.get_width() // 2,
                         window.height // 2 - deckImage.get_height() // 2))
 
+font0 = pygame.font.Font(None, 128)
+font0.set_bold(True)
+font0.set_underline(True)
 font1 = pygame.font.Font(None, 32)
 font2 = pygame.font.Font(None, 24)
 font3 = pygame.font.Font(None, 16)
@@ -63,9 +66,11 @@ if __name__ == "__main__":
             running = False
             pygame.quit()
             exit(0)
+        txt_surface0 = font0.render("InfinUno", True, (220, 220, 220))
         txt_surface1 = font1.render("Enter the lobby password to create or join a game.", True, color)
         txt_surface2 = font1.render(text, True, color)
-        window.window.blit(txt_surface1, (input_box.x, input_box.y-32))
+        window.window.blit(txt_surface0, (width//2 - txt_surface0.get_width()//2, height//3))
+        window.window.blit(txt_surface1, (width//2 - txt_surface1.get_width()//2, input_box.y-32))
         window.window.blit(txt_surface2, (input_box.x+5, input_box.y+5))
         pygame.draw.rect(window.window, color, input_box, 2)
         show_deck(window, deck)
