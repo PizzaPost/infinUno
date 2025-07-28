@@ -1,7 +1,8 @@
-import random
-import pygame
-import os
 import copy
+import os
+import random
+
+import pygame
 
 pygame.init()
 pygame.display.init()
@@ -17,24 +18,11 @@ def getImageList(extraImages: list[str] = []) -> list[str]:
 
 
 class Card:
-    def __init__(
-        self,
-        name: str = "",
-        add: int = 0,
-        mult: float = 1.0,
-        pow: float = 1.0,
-        affects: list = [1],
-        affectInvert: bool = False,
-        skip: bool = False,
-        reverse: bool = False,
-        color: str = "",
-        nextColor: list[str] = [],
-        corner: str = "",
-        image: list[str] = getImageList([
-            "resources/cards/unoBG.png", "resources/cards/unoFG.png"
-        ]),
-        weight: float = 1.0,
-    ):
+    def __init__(self, name: str = "", add: int = 0, mult: float = 1.0, pow: float = 1.0, affects: list = [1],
+                 affectInvert: bool = False, skip: bool = False, reverse: bool = False, color: str = "",
+                 nextColor: list[str] = [], corner: str = "",
+                 image: list[str] = getImageList(["resources/cards/unoBG.png", "resources/cards/unoFG.png"]),
+                 weight: float = 1.0):
         self.name = name
         self.add = add
         self.mult = mult
@@ -93,290 +81,106 @@ ALL_CARDS = []
 for color in ["red", "blue", "green", "yellow", "purple"]:
     for i in range(10):
         ALL_CARDS.append(
-            Card(
-                name=color + str(i),
-                color=color,
-                corner=str(i),
-                image=getImageList(
-                    [
-                        f"resources/cards/base/{color}.png",
-                        f"resources/cards/mini_card/{color}.png",
-                        f"resources/cards/corners/{i}.png",
-                    ]
-                ),
-                weight=1.0,
-            )
-        )
+            Card(name=color + str(i), color=color, corner=str(i),
+                 image=getImageList([f"resources/cards/base/{color}.png",
+                                     f"resources/cards/mini_card/{color}.png",
+                                     f"resources/cards/corners/{i}.png"]), weight=1.0))
 
     ALL_CARDS.append(
-        Card(
-            name=color + "skip",
-            color=color,
-            skip=True,
-            image=getImageList(
-                [
-                    f"resources/cards/base/{color}.png",
-                    f"resources/cards/mini_card/{color}.png",
-                    f"resources/cards/corners/skip.png",
-                ]
-            ),
-            weight=1.0,
-        )
-    )
+        Card(name=color + "skip", color=color, skip=True,
+             image=getImageList([f"resources/cards/base/{color}.png",
+                                 f"resources/cards/mini_card/{color}.png",
+                                 f"resources/cards/corners/skip.png"]), weight=1.0))
 
     ALL_CARDS.append(
-        Card(
-            name=color + "reverse",
-            color=color,
-            reverse=True,
-            image=getImageList(
-                [
-                    f"resources/cards/base/{color}.png",
-                    f"resources/cards/mini_card/{color}.png",
-                    f"resources/cards/corners/reverse.png",
-                ]
-            ),
-            weight=1.0,
-        )
-    )
+        Card(name=color + "reverse", color=color, reverse=True,
+             image=getImageList([f"resources/cards/base/{color}.png",
+                                 f"resources/cards/mini_card/{color}.png",
+                                 f"resources/cards/corners/reverse.png"]), weight=1.0))
 
     ALL_CARDS.append(
-        Card(
-            name=color + "+2",
-            color=color,
-            add=2,
-            skip=True,
-            image=getImageList(
-                [
-                    f"resources/cards/base/{color}.png",
-                    f"resources/cards/mini_card/{color}.png",
-                    "resources/cards/corners/plu2.png",
-                ]
-            ),
-            weight=1.0,
-        )
-    )
+        Card(name=color + "+2", color=color, add=2, skip=True,
+             image=getImageList([f"resources/cards/base/{color}.png",
+                                 f"resources/cards/mini_card/{color}.png",
+                                 "resources/cards/corners/plu2.png"]), weight=1.0))
 
     ALL_CARDS.append(
-        Card(
-            name=color + "+1",
-            color=color,
-            skip=True,
-            add=1,
-            image=getImageList(
-                [
-                    f"resources/cards/base/{color}.png",
-                    f"resources/cards/mini_card/{color}.png",
-                    "resources/cards/corners/plu1.png",
-                ]
-            ),
-            weight=1.0,
-        )
-    )
+        Card(name=color + "+1", color=color, skip=True, add=1,
+             image=getImageList([f"resources/cards/base/{color}.png",
+                                 f"resources/cards/mini_card/{color}.png",
+                                 "resources/cards/corners/plu1.png"]), weight=1.0))
 
     ALL_CARDS.append(
-        Card(
-            name=color + "-1",
-            color=color,
-            add=-1,
-            affects=[0],
-            image=getImageList(
-                [
-                    f"resources/cards/base/{color}.png",
-                    f"resources/cards/mini_card/{color}.png",
-                    "resources/cards/corners/min1.png",
-                ]
-            ),
-            weight=1.0,
-        )
-    )
+        Card(name=color + "-1", color=color, add=-1, affects=[0],
+             image=getImageList([f"resources/cards/base/{color}.png",
+                                 f"resources/cards/mini_card/{color}.png",
+                                 "resources/cards/corners/min1.png"]), weight=1.0))
 
 ALL_CARDS.append(
-    Card(
-        name="wild",
-        color="choice",
-        image=getImageList(
-            [
-                "resources/cards/base/multicolored.png",
-                "resources/cards/mini_card/uncolored.png",
-                "resources/cards/corners/questionmark.png",
-            ]
-        ),
-        weight=1.0,
-    )
-)
+    Card(name="wild", color="choice",
+         image=getImageList(["resources/cards/base/multicolored.png",
+                             "resources/cards/mini_card/uncolored.png",
+                             "resources/cards/corners/questionmark.png"]), weight=1.0))
 
 ALL_CARDS.append(
-    Card(
-        name="+4",
-        color="choice",
-        add=4,
-        skip=True,
-        image=getImageList(
-            [
-                "resources/cards/base/multicolored.png",
-                "resources/cards/mini_card/uncolored.png",
-                "resources/cards/corners/plu4.png",
-            ]
-        ),
-        weight=1.0,
-    )
-)
+    Card(name="+4", color="choice", add=4, skip=True,
+         image=getImageList(["resources/cards/base/multicolored.png",
+                             "resources/cards/mini_card/uncolored.png",
+                             "resources/cards/corners/plu4.png"]), weight=1.0))
 
 ALL_CARDS.append(
-    Card(
-        name="*4",
-        color="choice",
-        mult=4,
-        skip=True,
-        image=getImageList(
-            [
-                "resources/cards/base/multicolored.png",
-                "resources/cards/mini_card/uncolored.png",
-                "resources/cards/corners/mul4.png",
-            ]
-        ),
-        weight=1.0,
-    )
-)
+    Card(name="*4", color="choice", mult=4, skip=True,
+         image=getImageList(["resources/cards/base/multicolored.png",
+                             "resources/cards/mini_card/uncolored.png",
+                             "resources/cards/corners/mul4.png"]), weight=1.0))
 
 ALL_CARDS.append(
-    Card(
-        name="*2",
-        color="choice",
-        mult=2,
-        skip=True,
-        image=getImageList(
-            [
-                "resources/cards/base/multicolored.png",
-                "resources/cards/mini_card/uncolored.png",
-                "resources/cards/corners/mul2.png",
-            ]
-        ),
-        weight=1.0,
-    )
-)
+    Card(name="*2", color="choice", mult=2, skip=True,
+         image=getImageList(["resources/cards/base/multicolored.png",
+                             "resources/cards/mini_card/uncolored.png",
+                             "resources/cards/corners/mul2.png"]), weight=1.0))
 
 ALL_CARDS.append(
-    Card(
-        name="/2",
-        color="choice",
-        mult=1 / 2,
-        skip=True,
-        image=getImageList(
-            [
-                "resources/cards/base/multicolored.png",
-                "resources/cards/mini_card/uncolored.png",
-                "resources/cards/corners/div2.png",
-            ]
-        ),
-        weight=1.0,
-    )
-)
+    Card(name="/2", color="choice", mult=1 / 2, skip=True,
+         image=getImageList(["resources/cards/base/multicolored.png",
+                             "resources/cards/mini_card/uncolored.png",
+                             "resources/cards/corners/div2.png"]), weight=1.0))
 
 ALL_CARDS.append(
-    Card(
-        name="plus10",
-        color="choice",
-        add=10,
-        skip=True,
-        image=getImageList(
-            [
-                "resources/cards/base/multicolored.png",
-                "resources/cards/mini_card/uncolored.png",
-                "resources/cards/corners/plu10.png",
-            ]
-        ),
-        weight=1.0,
-    )
-)
+    Card(name="plus10", color="choice", add=10, skip=True,
+         image=getImageList(["resources/cards/base/multicolored.png",
+                             "resources/cards/mini_card/uncolored.png",
+                             "resources/cards/corners/plu10.png"]), weight=1.0))
 
 ALL_CARDS.append(
-    Card(
-        name="-10",
-        color="choice",
-        add=-10,
-        affects=[0],
-        skip=True,
-        image=getImageList(
-            [
-                "resources/cards/base/multicolored.png",
-                "resources/cards/mini_card/uncolored.png",
-                "resources/cards/corners/min10.png",
-            ]
-        ),
-        weight=1.0,
-    )
-)
+    Card(name="-10", color="choice", add=-10, affects=[0], skip=True,
+         image=getImageList(["resources/cards/base/multicolored.png",
+                             "resources/cards/mini_card/uncolored.png",
+                             "resources/cards/corners/min10.png"]), weight=1.0))
 
 ALL_CARDS.append(
-    Card(
-        name="/3",
-        color="choice",
-        mult=1 / 3,
-        skip=True,
-        image=getImageList(
-            [
-                "resources/cards/base/multicolored.png",
-                "resources/cards/mini_card/uncolored.png",
-                "resources/cards/corners/div3.png",
-            ]
-        ),
-        weight=1.0,
-    )
-)
+    Card(name="/3", color="choice", mult=1 / 3, skip=True,
+         image=getImageList(["resources/cards/base/multicolored.png",
+                             "resources/cards/mini_card/uncolored.png",
+                             "resources/cards/corners/div3.png"]), weight=1.0))
 
 ALL_CARDS.append(
-    Card(
-        name="/4",
-        color="choice",
-        mult=1 / 4,
-        skip=True,
-        image=getImageList(
-            [
-                "resources/cards/base/multicolored.png",
-                "resources/cards/mini_card/uncolored.png",
-                "resources/cards/corners/div4.png",
-            ]
-        ),
-        weight=1.0,
-    )
-)
+    Card(name="/4", color="choice", mult=1 / 4, skip=True,
+         image=getImageList(["resources/cards/base/multicolored.png",
+                             "resources/cards/mini_card/uncolored.png",
+                             "resources/cards/corners/div4.png"]), weight=1.0))
 
 ALL_CARDS.append(
-    Card(
-        name="^2",
-        color="choice",
-        pow=2,
-        skip=True,
-        image=getImageList(
-            [
-                "resources/cards/base/multicolored.png",
-                "resources/cards/mini_card/uncolored.png",
-                "resources/cards/corners/pow2.png",
-            ]
-        ),
-        weight=1.0,
-    )
-)
+    Card(name="^2", color="choice", pow=2, skip=True,
+         image=getImageList(["resources/cards/base/multicolored.png",
+                             "resources/cards/mini_card/uncolored.png",
+                             "resources/cards/corners/pow2.png"]), weight=1.0))
 
 ALL_CARDS.append(
-    Card(
-        name="-4",
-        color="choice",
-        add=-4,
-        affects=[0],
-        skip=True,
-        image=getImageList(
-            [
-                "resources/cards/base/multicolored.png",
-                "resources/cards/mini_card/uncolored.png",
-                "resources/cards/corners/min4.png",
-            ]
-        ),
-        weight=1.0,
-    )
-)
+    Card(name="-4", color="choice", add=-4, affects=[0], skip=True,
+         image=getImageList(["resources/cards/base/multicolored.png",
+                             "resources/cards/mini_card/uncolored.png",
+                             "resources/cards/corners/min4.png"]), weight=1.0))
 
 
 class Deck:
@@ -402,10 +206,10 @@ class Deck:
 
     def draw(self, count: int = 1):
         if count > 0:
-            drawn_cards = [randomCard() for _ in range(count)]
+            drawn_cards = [randomCard() for x in range(count)]
             self.cards.extend(drawn_cards)
         elif count < 0:
-            for _ in range(-count):
+            for x in range(-count):
                 if self.cards:
                     self.cards.pop(random.randint(0, len(self.cards) - 1))
 
@@ -430,8 +234,10 @@ def randomCard():
     card = random.choices(ALL_CARDS, weights=weights, k=1)[0]
     return copyCard(card)
 
+
 def copyCard(card):
     return card.__deepcopy__()
+
 
 pygame.quit()
 if __name__ == "__main__":
