@@ -11,8 +11,8 @@ from infinUno import cards, visuals, players  # type: ignore
 pygame.init()
 
 
-def show_deck(window, deck):
-    deckImage = visuals.deckImage(window, deck)
+def show_deck(window, deck, start_animation_frame_count=[]):
+    deckImage = visuals.deckImage(window, deck, start_animation_frame_count)
     window.window.blit(deckImage,
                        (window.width // 2 - deckImage.get_width() // 2,
                         window.height // 2 - deckImage.get_height() // 2))
@@ -29,6 +29,8 @@ title_size = 30
 max_title_size = 128
 start_animation_frame_count = 0
 start_animation_duration = 250
+deck_animation_state = []  # Each item is {"card": card, "x": x, "y": y, "angle": angle}
+
 def ease_in_out_cubic(t):
     return 4 * t**3 if t < 0.5 else 1 - (-2 * t + 2)**3 / 2
 if __name__ == "__main__":
@@ -37,7 +39,6 @@ if __name__ == "__main__":
     height=window.height
     input_box = pygame.Rect(width//2 - 200, height//2-16, 400, 32)
     deck = cards.Deck()
-    for x in range(10): deck.add(cards.randomCard())
     running = True
     while running:
         window.window.fill((20, 20, 20))
@@ -86,7 +87,9 @@ if __name__ == "__main__":
         window.window.blit(txt_surface1, (width//2 - txt_surface1.get_width()//2, input_box.y-32))
         window.window.blit(txt_surface2, (input_box.x+5, input_box.y+5))
         pygame.draw.rect(window.window, color, input_box, 2)
-        show_deck(window, deck)
+        if len(deck.cards)<10 and start_animation_frame_count%10==0:
+            deck.add(cards.randomCard())
+        show_deck(window, deck, deck_animation_state)
         # PER FRAME CODE HERE
 
         pygame.display.flip()
