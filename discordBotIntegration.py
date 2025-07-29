@@ -34,7 +34,7 @@ def init(bot, tree=None):
         img_bytes = renderGameStateBytes(
             window, last_played_card, players.Player(), [players.Player()]
         )
-        await ctx.send(file=discord.File(img_bytes, filename="your_deck.png"))
+        await ctx.response.send_message(file=discord.File(img_bytes, filename="your_deck.png"))
 
     @tree.command(name="infinuno")
     async def infinUno(ctx):
