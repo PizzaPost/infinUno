@@ -386,8 +386,9 @@ class Deck:
         if cardCount > 0:
             self.draw(cardCount)
 
-    def add(self, card: Card):
-        self.cards.append(card)
+    def add(self, cards: list[Card] | Card):
+        card = cards if isinstance(cards, list) else [cards]
+        self.cards.extend(card)
 
     def remove(self, card: Card):
         if card in self.cards:
@@ -404,7 +405,7 @@ class Deck:
     def draw(self, count: int = 1):
         if count > 0:
             drawn_cards = [randomCard() for x in range(count)]
-            self.cards.extend(drawn_cards)
+            self.add(drawn_cards)
         elif count < 0:
             for x in range(-count):
                 if self.cards:
