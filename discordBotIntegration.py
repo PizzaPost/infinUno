@@ -21,11 +21,10 @@ def renderGameStateBytes(window, last_played_card, player, Players):
     return img_bytes
 
 
-def init(bot):
-    @bot.command(
-        name="infinunodeck",
-        description="Display a random infinUno deck with a random starting card.",
-    )
+def init(bot, tree=None):
+    if not tree:
+        tree = bot.tree
+    @tree.command(name="infinunodeck")
     async def infinUnoRandomDeckPreview(ctx):
         """Generates a random deck and sends it as an image."""
         last_played_card = cards.randomCard()
@@ -37,7 +36,7 @@ def init(bot):
         )
         await ctx.send(file=discord.File(img_bytes, filename="your_deck.png"))
 
-    @bot.tree.command(name="infinuno")
+    @tree.command(name="infinuno")
     async def infinUno(ctx):
         """Starts the InfinUno game."""
 
