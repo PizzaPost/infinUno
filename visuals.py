@@ -1,7 +1,7 @@
 # PizzaPost magic here
 import os
 import sys
-
+import random
 import pygame
 
 # read this comment in main.py for more info
@@ -53,15 +53,18 @@ class Window:
 def deckImage(window, deck, animation_state=[]):
     FRAME = cards.loadResource("resources/cards/frame.png").convert_alpha()
     surface = pygame.Surface(window.window.get_size(), pygame.SRCALPHA)
-    len_cards = len(deck.cards)
 
-    for i, card in enumerate(deck.cards):
+    playerCards = random.sample(deck.cards, min(100, len(deck.cards)))
+
+    len_cards = len(playerCards)
+
+    for i, card in enumerate(playerCards):
         card_spread = (
             0
             if len_cards == 1
             else (
                 (window.width - 20 - FRAME.get_width()) / (len_cards - 1)
-                if len(deck.cards) * FRAME.get_width() > window.width * 2 - 20
+                if len(playerCards) * FRAME.get_width() > window.width * 2 - 20
                 else FRAME.get_width() // 2
             )
         )
@@ -106,7 +109,7 @@ def deckImage(window, deck, animation_state=[]):
         )
 
     # Remove extra animations
-    while len(animation_state) > len(deck.cards):
+    while len(animation_state) > len(playerCards):
         animation_state.pop()
 
     return surface
