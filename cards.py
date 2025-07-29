@@ -439,3 +439,6 @@ def copyCard(card):
 pygame.quit()
 if __name__ == "__main__":
     print(ALL_CARDS)
+
+
+# shit
