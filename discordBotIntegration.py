@@ -32,7 +32,9 @@ def init(bot):
         window = visuals.Window(
             "InfinUno Deck Preview", pygame.display.set_mode((800, 600), pygame.HIDDEN)
         )
-        img_bytes = renderGameStateBytes(window, last_played_card, players.Player(), [players.Player()])
+        img_bytes = renderGameStateBytes(
+            window, last_played_card, players.Player(), [players.Player()]
+        )
         await ctx.send(file=discord.File(img_bytes, filename="your_deck.png"))
 
     @bot.tree.command(name="infinuno")
@@ -291,7 +293,6 @@ def init(bot):
                 mayPlay = False
                 if not self.players:
                     return True
-                
 
                 class CardSelect(ui.Select):
                     def __init__(self, cards):
@@ -344,7 +345,9 @@ def init(bot):
                     ) % self.num_players
                     if target_index >= 0:
                         target_players.append(self.players[target_index])
-                self.current_player_index = (self.current_player_index + 1) % self.num_players
+                self.current_player_index = (
+                    self.current_player_index + 1
+                ) % self.num_players
                 current_player = self.players[self.current_player_index]
 
                 # Handle stacking draw cards
@@ -365,7 +368,7 @@ def init(bot):
                                 self.last_played_card.mult = 1.0  # type: ignore # Reset multiplier after applying
                             if self.last_played_card.pow != 1.0:  # type: ignore
                                 self.drawCounter = int(
-                                    self.drawCounter ** self.last_played_card.pow  # type: ignore
+                                    self.drawCounter**self.last_played_card.pow  # type: ignore
                                 )
                                 self.last_played_card.pow = 1.0  # type: ignore # Reset power after applying
                         elif self.last_played_card.mult != 1.0:  # type: ignore
@@ -376,7 +379,7 @@ def init(bot):
                             self.last_played_card.mult = 1.0  # type: ignore # Reset multiplier after applying
                             if self.last_played_card.pow != 1.0:  # type: ignore
                                 self.drawCounter = int(
-                                    self.drawCounter ** self.last_played_card.pow  # type: ignore
+                                    self.drawCounter**self.last_played_card.pow  # type: ignore
                                 )
                                 self.last_played_card.pow = 1.0  # type: ignore # Reset power after applying
                         elif self.last_played_card.pow != 1.0:  # type: ignore
@@ -405,7 +408,10 @@ def init(bot):
                                 attachments=[
                                     discord.File(
                                         renderGameStateBytes(
-                                            self.window, self.last_played_card, target, self.players
+                                            self.window,
+                                            self.last_played_card,
+                                            target,
+                                            self.players,
                                         ),
                                         filename="your_deck.png",
                                     )
@@ -475,7 +481,10 @@ def init(bot):
                         attachments=[
                             discord.File(
                                 renderGameStateBytes(
-                                    self.window, self.last_played_card, current_player, self.players
+                                    self.window,
+                                    self.last_played_card,
+                                    current_player,
+                                    self.players,
                                 ),
                                 filename="your_deck.png",
                             )
