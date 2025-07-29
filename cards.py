@@ -389,6 +389,7 @@ class Deck:
     def add(self, cards: list[Card] | Card):
         card = cards if isinstance(cards, list) else [cards]
         self.cards.extend(card)
+        self.sort()
 
     def remove(self, card: Card):
         if card in self.cards:
