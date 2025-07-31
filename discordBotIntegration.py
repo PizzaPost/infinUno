@@ -24,6 +24,7 @@ def renderGameStateBytes(window, last_played_card, player, Players):
 def init(bot, tree=None):
     if not tree:
         tree = bot.tree
+
     @tree.command(name="infinunodeck")
     async def infinUnoRandomDeckPreview(ctx):
         """Generates a random deck and sends it as an image."""
@@ -34,7 +35,9 @@ def init(bot, tree=None):
         img_bytes = renderGameStateBytes(
             window, last_played_card, players.Player(), [players.Player()]
         )
-        await ctx.response.send_message(file=discord.File(img_bytes, filename="your_deck.png"))
+        await ctx.response.send_message(
+            file=discord.File(img_bytes, filename="your_deck.png")
+        )
 
     @tree.command(name="infinuno")
     async def infinUno(ctx):
@@ -350,52 +353,33 @@ def init(bot, tree=None):
                 current_player = self.players[self.current_player_index]
 
                 # Handle stacking draw cards
-                if (
-                    self.drawCounter != 0
-                    or self.last_played_card.add != 0
-                    or self.last_played_card.mult != 1.0
-                    or self.last_played_card.pow != 1.0
-                ):
+                if self.drawCounter != 0 or self.last_played_card.cmod != "":
                     if self.drawCounter == 0:
-                        if self.last_played_card.add != 0:  # type: ignore
-                            self.drawCounter = self.last_played_card.add  # type: ignore
-                            self.last_played_card.add = 0  # type: ignore # Remove the add from the card
-                            if self.last_played_card.mult != 1.0:  # type: ignore
-                                self.drawCounter = int(
-                                    self.drawCounter * self.last_played_card.mult  # type: ignore
-                                )
-                                self.last_played_card.mult = 1.0  # type: ignore # Reset multiplier after applying
-                            if self.last_played_card.pow != 1.0:  # type: ignore
-                                self.drawCounter = int(
-                                    self.drawCounter**self.last_played_card.pow  # type: ignore
-                                )
-                                self.last_played_card.pow = 1.0  # type: ignore # Reset power after applying
-                        elif self.last_played_card.mult != 1.0:  # type: ignore
-                            self.drawCounter = int(
-                                current_player.hand.count() * self.last_played_card.mult  # type: ignore
-                                - current_player.hand.count()
-                            )
-                            self.last_played_card.mult = 1.0  # type: ignore # Reset multiplier after applying
-                            if self.last_played_card.pow != 1.0:  # type: ignore
-                                self.drawCounter = int(
-                                    self.drawCounter**self.last_played_card.pow  # type: ignore
-                                )
-                                self.last_played_card.pow = 1.0  # type: ignore # Reset power after applying
-                        elif self.last_played_card.pow != 1.0:  # type: ignore
-                            self.drawCounter = int(
-                                current_player.hand.count() ** self.last_played_card.pow  # type: ignore
-                                - current_player.hand.count()
-                            )
-                            self.last_played_card.pow = 1.0  # type: ignore # Reset power after applying
-                    self.nextMessageContent += (
-                        f"\nThere was an existing draw counter of {self.drawCounter}."
-                    )
+                        self.drawCounter = current_player.hand.count()
+                        self.nextMessageContent += f"\nThe card {self.last_played_card.name} applies its modifiers to the whole hand of {current_player.name}, which is {self.drawCounter} cards."
+                        cmods = self.last_played_card.cmod.split(",")
+                        for cmod in cmods:
+                            try:
+                                cstring = "self.drawCounter = self.drawCounter" + cmod
+                                exec(cstring)
+                            except Exception as e:
+                                self.nextMessageContent += f"\nError applying {cmod} to the draw counter (skipping): {e}"
+                        self.drawCounter = int(
+                            self.drawCounter
+                        )  # convert to int only after applying modifiers to enable the cards to more precisely control the behaviour of the draw counter
+                        self.nextMessageContent += (
+                            f"\nThe new draw counter is {self.drawCounter}."
+                        )
+                        # clear used cmod from the card
+                        self.last_played_card.cmod = ""
+                    else:
+                        self.nextMessageContent += f"\nThere was an existing draw counter of {self.drawCounter}."
                     stackableFound = False
                     for target in target_players:
                         # Find stackable cards in target's hand
                         stackable = []
                         for c in target.hand.cards:
-                            if c.add != 0 or c.mult != 1.0:
+                            if c.cmod != "":
                                 stackable.append(c)
                         if stackable:
                             # Ask the user to pick a stackable card from a dropdown
@@ -535,13 +519,22 @@ def init(bot, tree=None):
                 """
                 target.hand.remove(played_card)
                 self.last_played_card = played_card
-                if self.drawCounter != 0:
-                    self.drawCounter = int(
-                        (self.drawCounter + played_card.add) * played_card.mult  # type: ignore
-                    )
-                    # remove used up effects from the played card
-                    played_card.add = 0
-                    played_card.mult = 1.0
+                if (
+                    self.drawCounter != 0  # this means this card is stacking onto an active draw stack
+                    and played_card.cmod != ""
+                ):
+                    # when stacking a card, apply the cmod here. When not, pass here and the cmod will be applied at the start of the next gameTick, so we can more easily access the correct players hand card count.
+                    cmods = played_card.cmod.split(",")
+                    for cmod in cmods:
+                        try:
+                            cstring = "self.drawCounter = self.drawCounter " + cmod
+                            exec(cstring)
+                        except Exception as e:
+                            self.nextMessageContent += (
+                                f"Error while stacking {cmod}: {e}"
+                            )
+                    self.drawCounter = int(self.drawCounter)
+                    played_card.cmod = ""
                 if played_card.reverse:
                     self.players.reverse()
                     self.current_player_index = self.players.index(current_player)
