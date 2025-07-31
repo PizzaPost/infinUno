@@ -21,9 +21,7 @@ class Card:
     def __init__(
         self,
         name: str = "",
-        add: int = 0,
-        mult: float = 1.0,
-        pow: float = 1.0,
+        cmod: str = "",
         affects: list = [1],
         affectInvert: bool = False,
         skip: bool = False,
@@ -36,10 +34,41 @@ class Card:
         ),
         weight: float = 1.0,
     ):
+        """
+        Initializes a new Card object.
+
+        Parameters
+        ----------
+        name : str, optional
+            The name of the card. Defaults to an empty string.
+        cmod : str, optional
+            The count modifier. This is a string which will be appended to "drawCounter = drawCounter" and executed to modify the draw counter accordingly. cmod will be split at every comma and each part will be executed separately in order. Defaults to an empty string.
+        affects : list, optional
+            A list of player indices that this card will affect. Defaults to [1], which is the next player in line.
+        affectInvert : bool, optional
+            Whether to invert the list of affected players. Defaults to False.
+        skip : bool, optional
+            Whether to skip the turns of all affected players as long as this card is the top card. Defaults to False.
+        reverse : bool, optional
+            Whether to reverse the order of play after playing this card. Defaults to False.
+        color : str, optional
+            The color of the card. Defaults to an empty string, which means the card has no color.
+        nextColor : list[str], optional
+            A list of colors that the next card must be. Defaults to an empty list, which means there is no color requirement.
+        corner : str, optional
+            The corner of the card. Used to allow playing cards with the same corner on top of this card, even if they don't meet the color requirement. Defaults to an empty string, which means the card has no extra corner allowance.
+        image : list[str], optional
+            A list of image paths to load and overlay on top of each other. Will be turned into a pygame.Surface on initialization. Any path will be rendered below the next. Defaults to a list containing the paths to the Uno background and foreground images.
+        weight : float, optional
+            The weight of the card. This can be used to determine the probability of drawing this card. Defaults to 1.0.
+
+        Returns
+        -------
+        None
+        """
+        pass
         self.name = name
-        self.add = add
-        self.mult = mult
-        self.pow = pow
+        self.cmod = cmod
         self.affects = affects
         self.affectInvert = affectInvert
         self.skip = skip
@@ -105,7 +134,6 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                         f"resources/cards/corners/{i}.png",
                     ]
                 ),
-                weight=1.0,
             )
         )
 
@@ -121,7 +149,6 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     f"resources/cards/corners/skip.png",
                 ]
             ),
-            weight=1.0,
         )
     )
 
@@ -137,7 +164,6 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     f"resources/cards/corners/reverse.png",
                 ]
             ),
-            weight=1.0,
         )
     )
 
@@ -145,7 +171,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
         Card(
             name=color + "+2",
             color=color,
-            add=2,
+            cmod="+2",
             skip=True,
             image=getImageList(
                 [
@@ -154,7 +180,6 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     "resources/cards/corners/plu2.png",
                 ]
             ),
-            weight=1.0,
         )
     )
 
@@ -163,7 +188,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
             name=color + "+1",
             color=color,
             skip=True,
-            add=1,
+            cmod="+1",
             image=getImageList(
                 [
                     f"resources/cards/base/{color}.png",
@@ -171,7 +196,6 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     "resources/cards/corners/plu1.png",
                 ]
             ),
-            weight=1.0,
         )
     )
 
@@ -179,7 +203,7 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
         Card(
             name=color + "-1",
             color=color,
-            add=-1,
+            cmod="-1",
             affects=[0],
             image=getImageList(
                 [
@@ -188,7 +212,6 @@ for color in ["red", "blue", "green", "yellow", "purple"]:
                     "resources/cards/corners/min1.png",
                 ]
             ),
-            weight=1.0,
         )
     )
 
@@ -203,7 +226,6 @@ ALL_CARDS.append(
                 "resources/cards/corners/questionmark.png",
             ]
         ),
-        weight=1.0,
     )
 )
 
@@ -211,7 +233,7 @@ ALL_CARDS.append(
     Card(
         name="+4",
         color="choice",
-        add=4,
+        cmod="+4",
         skip=True,
         image=getImageList(
             [
@@ -220,7 +242,6 @@ ALL_CARDS.append(
                 "resources/cards/corners/plu4.png",
             ]
         ),
-        weight=1.0,
     )
 )
 
@@ -228,7 +249,7 @@ ALL_CARDS.append(
     Card(
         name="*4",
         color="choice",
-        mult=4,
+        cmod="*4",
         skip=True,
         image=getImageList(
             [
@@ -237,7 +258,6 @@ ALL_CARDS.append(
                 "resources/cards/corners/mul4.png",
             ]
         ),
-        weight=1.0,
     )
 )
 
@@ -245,7 +265,7 @@ ALL_CARDS.append(
     Card(
         name="*2",
         color="choice",
-        mult=2,
+        cmod="*2",
         skip=True,
         image=getImageList(
             [
@@ -254,7 +274,6 @@ ALL_CARDS.append(
                 "resources/cards/corners/mul2.png",
             ]
         ),
-        weight=1.0,
     )
 )
 
@@ -262,7 +281,7 @@ ALL_CARDS.append(
     Card(
         name="/2",
         color="choice",
-        mult=1 / 2,
+        cmod="/2",
         skip=True,
         image=getImageList(
             [
@@ -271,7 +290,6 @@ ALL_CARDS.append(
                 "resources/cards/corners/div2.png",
             ]
         ),
-        weight=1.0,
     )
 )
 
@@ -279,7 +297,7 @@ ALL_CARDS.append(
     Card(
         name="plus10",
         color="choice",
-        add=10,
+        cmod="+10",
         skip=True,
         image=getImageList(
             [
@@ -288,7 +306,6 @@ ALL_CARDS.append(
                 "resources/cards/corners/plu10.png",
             ]
         ),
-        weight=1.0,
     )
 )
 
@@ -296,7 +313,7 @@ ALL_CARDS.append(
     Card(
         name="-10",
         color="choice",
-        add=-10,
+        cmod="-10",
         affects=[0],
         skip=True,
         image=getImageList(
@@ -306,7 +323,6 @@ ALL_CARDS.append(
                 "resources/cards/corners/min10.png",
             ]
         ),
-        weight=1.0,
     )
 )
 
@@ -314,7 +330,7 @@ ALL_CARDS.append(
     Card(
         name="/3",
         color="choice",
-        mult=1 / 3,
+        cmod="/3",
         skip=True,
         image=getImageList(
             [
@@ -323,7 +339,6 @@ ALL_CARDS.append(
                 "resources/cards/corners/div3.png",
             ]
         ),
-        weight=1.0,
     )
 )
 
@@ -331,7 +346,7 @@ ALL_CARDS.append(
     Card(
         name="/4",
         color="choice",
-        mult=1 / 4,
+        cmod="/4",
         skip=True,
         image=getImageList(
             [
@@ -340,7 +355,6 @@ ALL_CARDS.append(
                 "resources/cards/corners/div4.png",
             ]
         ),
-        weight=1.0,
     )
 )
 
@@ -348,7 +362,7 @@ ALL_CARDS.append(
     Card(
         name="^2",
         color="choice",
-        pow=2,
+        cmod="**2",
         skip=True,
         image=getImageList(
             [
@@ -357,7 +371,6 @@ ALL_CARDS.append(
                 "resources/cards/corners/pow2.png",
             ]
         ),
-        weight=1.0,
     )
 )
 
@@ -365,7 +378,7 @@ ALL_CARDS.append(
     Card(
         name="-4",
         color="choice",
-        add=-4,
+        cmod="-4",
         affects=[0],
         skip=True,
         image=getImageList(
@@ -375,7 +388,6 @@ ALL_CARDS.append(
                 "resources/cards/corners/min4.png",
             ]
         ),
-        weight=1.0,
     )
 )
 

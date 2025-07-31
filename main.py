@@ -6,7 +6,9 @@ import pygame
 # This makes sure the parent directory is on path, allowing imports from inside the infinUno package, while also allowing other scripts to use this folder as a package.
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from infinUno import cards, visuals, players  # type: ignore
+if __name__ == "__main__" and __package__ is None:
+    __package__ = "infinUno"
+from . import cards, visuals, players  # type: ignore
 
 pygame.init()
 
